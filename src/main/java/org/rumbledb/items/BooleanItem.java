@@ -23,6 +23,7 @@ package org.rumbledb.items;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import decimalgamma.DecimalGamma;
 import org.rumbledb.api.Item;
 import org.rumbledb.types.BuiltinTypesCatalogue;
 import org.rumbledb.types.ItemType;
@@ -47,8 +48,18 @@ public class BooleanItem implements Item {
     }
 
     @Override
+    public int getTypeID() {
+        return 5;
+    }
+
+    @Override
     public boolean getBooleanValue() {
         return this.getValue();
+    }
+
+    @Override
+    public byte[] serializeBinary() {
+        return DecimalGamma.Encode(this.value ? 1 : 0).toBytes();
     }
 
     @Override

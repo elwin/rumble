@@ -23,6 +23,7 @@ package org.rumbledb.items;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import decimalgamma.DecimalGamma;
 import org.rumbledb.api.Item;
 import org.rumbledb.exceptions.ExceptionMetadata;
 import org.rumbledb.runtime.flwor.NativeClauseContext;
@@ -141,5 +142,10 @@ public class DecimalItem implements Item {
     @Override
     public boolean isAtomic() {
         return true;
+    }
+
+    @Override
+    public byte[] serializeBinary() {
+        return DecimalGamma.Encode(this.value).toBytes();
     }
 }

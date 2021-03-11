@@ -3,6 +3,7 @@ package org.rumbledb.items;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import decimalgamma.DecimalGamma;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
@@ -70,6 +71,11 @@ public class DateTimeItem implements Item {
             this.hasTimeZone = false;
             this.value = this.value.withZoneRetainFields(DateTimeZone.UTC);
         }
+    }
+
+    @Override
+    public int getTypeID() {
+        return 7;
     }
 
     @Override
@@ -228,5 +234,10 @@ public class DateTimeItem implements Item {
     @Override
     public boolean isAtomic() {
         return true;
+    }
+
+    @Override
+    public byte[] serializeBinary() {
+        return DecimalGamma.Encode(this.value.getMillis()).toBytes();
     }
 }

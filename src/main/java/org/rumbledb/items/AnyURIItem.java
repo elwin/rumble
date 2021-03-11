@@ -121,4 +121,9 @@ public class AnyURIItem implements Item {
     public boolean isAtomic() {
         return true;
     }
+
+    @Override
+    public byte[] serializeBinary() {
+        return this.serialize().getBytes();
+    }
 }

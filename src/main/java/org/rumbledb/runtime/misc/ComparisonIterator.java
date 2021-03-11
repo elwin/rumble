@@ -205,6 +205,13 @@ public class ComparisonIterator extends AtMostOneItemLocalRuntimeIterator {
         );
     }
 
+    private static boolean comparable(Item left, Item right) {
+        if (!left.isAtomic() || !right.isAtomic())
+            return false;
+
+        return left.getBinaryKey()[0] == right.getBinaryKey()[0];
+    }
+
     public static long compareItems(
             Item left,
             Item right,
@@ -220,127 +227,135 @@ public class ComparisonIterator extends AtMostOneItemLocalRuntimeIterator {
         if (!left.isNull() && right.isNull()) {
             return 1;
         }
-        if (
-            left.isInt()
-                && right.isInt()
-        ) {
-            return processInt(left.getIntValue(), right.getIntValue());
+
+
+        if (comparable(left, right)) {
+            return processBinary(left.getBinaryKey(), right.getBinaryKey());
         }
 
-        // General cases
-        if (left.isDouble() && right.isNumeric()) {
-            double l = left.getDoubleValue();
-            double r = 0;
-            if (right.isDouble()) {
-                r = right.getDoubleValue();
-            } else {
-                r = right.castToDoubleValue();
-            }
-            return processDouble(l, r);
-        }
-        if (right.isDouble() && left.isNumeric()) {
-            double l = left.castToDoubleValue();
-            double r = right.getDoubleValue();
-            return processDouble(l, r);
-        }
-        if (right.isDouble() && left.isNumeric()) {
-            double l = left.castToDoubleValue();
-            double r = right.getDoubleValue();
-            return processDouble(l, r);
-        }
-        if (left.isFloat() && right.isNumeric()) {
-            float l = left.getFloatValue();
-            float r = 0;
-            if (right.isFloat()) {
-                r = right.getFloatValue();
-            } else {
-                r = right.castToFloatValue();
-            }
-            return processFloat(l, r);
-        }
-        if (left.isInteger() && right.isInteger()) {
-            BigInteger l = left.getIntegerValue();
-            BigInteger r = right.getIntegerValue();
-            return processInteger(l, r);
-        }
-        if (left.isDecimal() && right.isDecimal()) {
-            BigDecimal l = left.getDecimalValue();
-            BigDecimal r = right.getDecimalValue();
-            return processDecimal(l, r);
-        }
-        if (left.isYearMonthDuration() && right.isYearMonthDuration()) {
-            Period l = left.getDurationValue();
-            Period r = right.getDurationValue();
-            return processDuration(l, r);
-        }
-        if (left.isDayTimeDuration() && right.isDayTimeDuration()) {
-            Period l = left.getDurationValue();
-            Period r = right.getDurationValue();
-            return processDuration(l, r);
-        }
-        if (left.isDuration() && right.isDuration()) {
-            switch (comparisonOperator) {
-                case VC_EQ:
-                case GC_EQ:
-                case VC_NE:
-                case GC_NE:
-                    Period l = left.getDurationValue();
-                    Period r = right.getDurationValue();
-                    return processDuration(l, r);
-                default:
-            }
-        }
-        if (left.isHexBinary() && right.isHexBinary()) {
-            byte[] l = left.getBinaryValue();
-            byte[] r = right.getBinaryValue();
-            return processBytes(l, r);
-        }
-        if (left.isBase64Binary() && right.isBase64Binary()) {
-            byte[] l = left.getBinaryValue();
-            byte[] r = right.getBinaryValue();
-            return processBytes(l, r);
-        }
-        if (left.isDate() && right.isDate()) {
-            DateTime l = left.getDateTimeValue();
-            DateTime r = right.getDateTimeValue();
-            return processDateTime(l, r);
-        }
-        if (left.isTime() && right.isTime()) {
-            DateTime l = left.getDateTimeValue();
-            DateTime r = right.getDateTimeValue();
-            return processDateTime(l, r);
-        }
-        if (left.isDateTime() && right.isDateTime()) {
-            DateTime l = left.getDateTimeValue();
-            DateTime r = right.getDateTimeValue();
-            return processDateTime(l, r);
-        }
-        if (left.isBoolean() && right.isBoolean()) {
-            Boolean l = left.getBooleanValue();
-            Boolean r = right.getBooleanValue();
-            return processBoolean(l, r);
-        }
-        if (left.isString() && right.isString()) {
-            String l = left.getStringValue();
-            String r = right.getStringValue();
-            return processString(l, r);
-        }
-        if (left.isAnyURI() && right.isAnyURI()) {
-            String l = left.getStringValue();
-            String r = right.getStringValue();
-            return processString(l, r);
-        }
-        if (left.isString() && right.isAnyURI()) {
-            String l = left.getStringValue();
-            String r = right.serialize();
-            return processString(l, r);
-        }
-        if (left.isAnyURI() && right.isString()) {
-            String l = left.serialize();
-            String r = right.getStringValue();
-            return processString(l, r);
-        }
         return Long.MIN_VALUE;
+
+        // if (
+        // left.isInt()
+        // && right.isInt()
+        // ) {
+        // return processInt(left.getIntValue(), right.getIntValue());
+        // }
+        //
+        // // General cases
+        // if (left.isDouble() && right.isNumeric()) {
+        // double l = left.getDoubleValue();
+        // double r = 0;
+        // if (right.isDouble()) {
+        // r = right.getDoubleValue();
+        // } else {
+        // r = right.castToDoubleValue();
+        // }
+        // return processDouble(l, r);
+        // }
+        // if (right.isDouble() && left.isNumeric()) {
+        // double l = left.castToDoubleValue();
+        // double r = right.getDoubleValue();
+        // return processDouble(l, r);
+        // }
+        // if (right.isDouble() && left.isNumeric()) {
+        // double l = left.castToDoubleValue();
+        // double r = right.getDoubleValue();
+        // return processDouble(l, r);
+        // }
+        // if (left.isFloat() && right.isNumeric()) {
+        // float l = left.getFloatValue();
+        // float r = 0;
+        // if (right.isFloat()) {
+        // r = right.getFloatValue();
+        // } else {
+        // r = right.castToFloatValue();
+        // }
+        // return processFloat(l, r);
+        // }
+        // if (left.isInteger() && right.isInteger()) {
+        // BigInteger l = left.getIntegerValue();
+        // BigInteger r = right.getIntegerValue();
+        // return processInteger(l, r);
+        // }
+        // if (left.isDecimal() && right.isDecimal()) {
+        // BigDecimal l = left.getDecimalValue();
+        // BigDecimal r = right.getDecimalValue();
+        // return processDecimal(l, r);
+        // }
+        // if (left.isYearMonthDuration() && right.isYearMonthDuration()) {
+        // Period l = left.getDurationValue();
+        // Period r = right.getDurationValue();
+        // return processDuration(l, r);
+        // }
+        // if (left.isDayTimeDuration() && right.isDayTimeDuration()) {
+        // Period l = left.getDurationValue();
+        // Period r = right.getDurationValue();
+        // return processDuration(l, r);
+        // }
+        // if (left.isDuration() && right.isDuration()) {
+        // switch (comparisonOperator) {
+        // case VC_EQ:
+        // case GC_EQ:
+        // case VC_NE:
+        // case GC_NE:
+        // Period l = left.getDurationValue();
+        // Period r = right.getDurationValue();
+        // return processDuration(l, r);
+        // default:
+        // }
+        // }
+        // if (left.isHexBinary() && right.isHexBinary()) {
+        // byte[] l = left.getBinaryValue();
+        // byte[] r = right.getBinaryValue();
+        // return processBytes(l, r);
+        // }
+        // if (left.isBase64Binary() && right.isBase64Binary()) {
+        // byte[] l = left.getBinaryValue();
+        // byte[] r = right.getBinaryValue();
+        // return processBytes(l, r);
+        // }
+        // if (left.isDate() && right.isDate()) {
+        // DateTime l = left.getDateTimeValue();
+        // DateTime r = right.getDateTimeValue();
+        // return processDateTime(l, r);
+        // }
+        // if (left.isTime() && right.isTime()) {
+        // DateTime l = left.getDateTimeValue();
+        // DateTime r = right.getDateTimeValue();
+        // return processDateTime(l, r);
+        // }
+        // if (left.isDateTime() && right.isDateTime()) {
+        // DateTime l = left.getDateTimeValue();
+        // DateTime r = right.getDateTimeValue();
+        // return processDateTime(l, r);
+        // }
+        // if (left.isBoolean() && right.isBoolean()) {
+        // Boolean l = left.getBooleanValue();
+        // Boolean r = right.getBooleanValue();
+        // return processBoolean(l, r);
+        // }
+        // if (left.isString() && right.isString()) {
+        // String l = left.getStringValue();
+        // String r = right.getStringValue();
+        // return processString(l, r);
+        // }
+        // if (left.isAnyURI() && right.isAnyURI()) {
+        // String l = left.getStringValue();
+        // String r = right.getStringValue();
+        // return processString(l, r);
+        // }
+        // if (left.isString() && right.isAnyURI()) {
+        // String l = left.getStringValue();
+        // String r = right.serialize();
+        // return processString(l, r);
+        // }
+        // if (left.isAnyURI() && right.isString()) {
+        // String l = left.serialize();
+        // String r = right.getStringValue();
+        // return processString(l, r);
+        // }
+        // return Long.MIN_VALUE;
     }
 
     private static int processDouble(
@@ -398,6 +413,14 @@ public class ComparisonIterator extends AtMostOneItemLocalRuntimeIterator {
             Boolean r
     ) {
         return Boolean.compare(l, r);
+    }
+
+    // TODO: remove wrapper?
+    private static int processBinary(
+            byte[] l,
+            byte[] r
+    ) {
+        return processBytes(l, r);
     }
 
     private static int processString(

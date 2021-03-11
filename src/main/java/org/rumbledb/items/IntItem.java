@@ -24,6 +24,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 
+import decimalgamma.DecimalGamma;
 import org.rumbledb.api.Item;
 import org.rumbledb.exceptions.ExceptionMetadata;
 import org.rumbledb.expressions.comparison.ComparisonExpression.ComparisonOperator;
@@ -159,5 +160,10 @@ public class IntItem implements Item {
     @Override
     public boolean isAtomic() {
         return true;
+    }
+
+    @Override
+    public byte[] serializeBinary() {
+        return DecimalGamma.Encode(this.value).toBytes();
     }
 }

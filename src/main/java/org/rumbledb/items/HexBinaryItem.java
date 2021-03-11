@@ -35,6 +35,11 @@ public class HexBinaryItem implements Item {
     }
 
     @Override
+    public int getTypeID() {
+        return 8;
+    }
+
+    @Override
     public boolean equals(Object otherItem) {
         if (otherItem instanceof Item) {
             long c = ComparisonIterator.compareItems(
@@ -123,5 +128,10 @@ public class HexBinaryItem implements Item {
     @Override
     public boolean isAtomic() {
         return true;
+    }
+
+    @Override
+    public byte[] serializeBinary() {
+        return this.value;
     }
 }

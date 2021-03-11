@@ -153,4 +153,9 @@ public class StringItem implements Item {
     public boolean isAtomic() {
         return true;
     }
+
+    @Override
+    public byte[] serializeBinary() {
+        return this.value.getBytes();
+    }
 }

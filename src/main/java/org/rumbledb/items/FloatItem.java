@@ -24,6 +24,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 
+import decimalgamma.DecimalGamma;
 import org.rumbledb.api.Item;
 import org.rumbledb.exceptions.ExceptionMetadata;
 import org.rumbledb.exceptions.IteratorFlowException;
@@ -64,6 +65,11 @@ public class FloatItem implements Item {
     @Override
     public float getFloatValue() {
         return this.value;
+    }
+
+    @Override
+    public byte[] serializeBinary() {
+        return DecimalGamma.Encode(this.value).toBytes();
     }
 
     @Override

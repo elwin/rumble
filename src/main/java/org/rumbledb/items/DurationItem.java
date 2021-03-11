@@ -3,10 +3,8 @@ package org.rumbledb.items;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import org.joda.time.DurationFieldType;
-import org.joda.time.Instant;
-import org.joda.time.Period;
-import org.joda.time.PeriodType;
+import decimalgamma.DecimalGamma;
+import org.joda.time.*;
 import org.joda.time.format.ISOPeriodFormat;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
@@ -216,5 +214,14 @@ public class DurationItem implements Item {
     @Override
     public ItemType getDynamicType() {
         return BuiltinTypesCatalogue.durationItem;
+    }
+
+    @Override
+    public byte[] serializeBinary() {
+        return DecimalGamma.Encode(
+                this.getValue()
+                        .toDurationFrom(new DateTime(1970, 1, 1, 0, 0))
+                        .getMillis())
+                .toBytes();
     }
 }

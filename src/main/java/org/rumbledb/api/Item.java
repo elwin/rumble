@@ -593,11 +593,40 @@ public interface Item extends Serializable, KryoSerializable {
 
     /**
      * Get sparkSql string for the item
-     * 
+     *
      * @param context input context
      * @return String representing the item in a sparksql query or null if it is not supported for the item
      */
     default NativeClauseContext generateNativeQuery(NativeClauseContext context) {
         return NativeClauseContext.NoNativeQuery;
+    }
+
+    /**
+     * Returns the byte[] value of the item, if it is a atomic item of type binary key.
+     *
+     * @return the binary value as an array of bytes.
+     */
+    default byte[] serializeBinary() {
+        throw new UnsupportedOperationException("Operation not defined for type " + this.getDynamicType());
+    }
+
+    default int getTypeID() {
+        if (this.isNumeric())
+            return 1;
+        else if (this.isString() || this.isAnyURI())
+            return 2;
+        else if (this.isDuration())
+            return 3;
+
+        throw new UnsupportedOperationException("Operation not defined for type " + this.getDynamicType());
+    }
+
+    default byte[] getBinaryKey() {
+        byte[] b = this.serializeBinary();
+        byte[] out = new byte[1 + b.length];
+        out[0] = (byte) this.getTypeID();
+        System.arraycopy(b, 0, out, 1, b.length);
+
+        return out;
     }
 }
