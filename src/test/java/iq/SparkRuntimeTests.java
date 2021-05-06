@@ -60,6 +60,7 @@ public class SparkRuntimeTests extends RuntimeTests {
         Assert.assertTrue(
             "Expected output: " + expectedOutput + " Actual result: " + actualOutput,
             expectedOutput.equals(actualOutput)
+            // expectedOutput.length() == actualOutput.length()
         );
         // unorderedItemSequenceStringsAreEqual(expectedOutput, actualOutput));
     }

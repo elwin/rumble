@@ -43,6 +43,7 @@ import org.rumbledb.runtime.flwor.FlworDataFrameUtils;
 import org.rumbledb.runtime.flwor.expression.GroupByClauseSparkIteratorExpression;
 import org.rumbledb.runtime.flwor.udfs.GroupClauseArrayMergeAggregateResultsUDF;
 import org.rumbledb.runtime.flwor.udfs.GroupClauseCreateColumnsUDF;
+import org.rumbledb.runtime.flwor.udfs.BinaryGroupClauseCreateColumnsUDF;
 import org.rumbledb.runtime.flwor.udfs.GroupClauseSerializeAggregateResultsUDF;
 import sparksoniq.jsoniq.tuple.FlworKey;
 import sparksoniq.jsoniq.tuple.FlworTuple;
@@ -329,18 +330,20 @@ public class GroupByClauseSparkIterator extends RuntimeTupleIterator {
                 this.groupingExpressions.get(columnIndex).getVariableName(),
                 DynamicContext.VariableDependency.FULL
             );
-            // every expression contains an int column for null/empty/true/false/string/double check
-            String columnName = columnIndex + "-nullEmptyBooleanCheckField";
-            typedFields.add(DataTypes.createStructField(columnName, DataTypes.IntegerType, false));
-            columnName = columnIndex + "-stringField";
-            DataType columnType = DataTypes.StringType;
-            typedFields.add(DataTypes.createStructField(columnName, columnType, true));
-            columnName = columnIndex + "-doubleField";
-            columnType = DataTypes.DoubleType;
-            typedFields.add(DataTypes.createStructField(columnName, columnType, true));
-            columnName = columnIndex + "-durationField";
-            columnType = DataTypes.LongType;
-            typedFields.add(DataTypes.createStructField(columnName, columnType, true));
+            // // every expression contains an int column for null/empty/true/false/string/double check
+            // String columnName = columnIndex + "-nullEmptyBooleanCheckField";
+            // typedFields.add(DataTypes.createStructField(columnName, DataTypes.IntegerType, false));
+            // columnName = columnIndex + "-stringField";
+            // DataType columnType = DataTypes.StringType;
+            // typedFields.add(DataTypes.createStructField(columnName, columnType, true));
+            // columnName = columnIndex + "-doubleField";
+            // columnType = DataTypes.DoubleType;
+            // typedFields.add(DataTypes.createStructField(columnName, columnType, true));
+            // columnName = columnIndex + "-durationField";
+            // columnType = DataTypes.LongType;
+            // typedFields.add(DataTypes.createStructField(columnName, columnType, true));
+
+            typedFields.add(DataTypes.createStructField(String.valueOf(columnIndex), DataTypes.BinaryType, true));
         }
 
         String serializerUDFName = "serialize";
@@ -362,7 +365,15 @@ public class GroupByClauseSparkIterator extends RuntimeTupleIterator {
             .udf()
             .register(
                 "createGroupingColumns",
-                new GroupClauseCreateColumnsUDF(variableAccessNames, context, inputSchema, UDFcolumns, getMetadata()),
+                new BinaryGroupClauseCreateColumnsUDF(
+                        variableAccessNames,
+                        context,
+                        inputSchema,
+                        UDFcolumns,
+                        getMetadata()
+                ),
+                // new GroupClauseCreateColumnsUDF(variableAccessNames, context, inputSchema, UDFcolumns,
+                // getMetadata()),
                 DataTypes.createStructType(typedFields)
             );
 

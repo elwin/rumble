@@ -280,8 +280,9 @@
         <dependency>
             <groupId>com.github.rumbledb</groupId>
             <artifactId>decimalgamma</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.5-SNAPSHOT</version>
         </dependency>
+
     </dependencies>
 
     <distributionManagement>
@@ -337,7 +338,7 @@
         <repository>
             <id>github</id>
             <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/elwin/decimalgamma-java</url>
+            <url>https://maven.pkg.github.com/RumbleDB/decimalgamma-java</url>
         </repository>
     </repositories>
 

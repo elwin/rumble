@@ -384,4 +384,9 @@ public class NullItem implements Item {
     public int castToIntValue() {
         throw new OurBadException(" Item '" + this.serialize() + "' is a null!");
     }
+
+    @Override
+    public byte[] serializeBinary() {
+        return new byte[0];
+    }
 }

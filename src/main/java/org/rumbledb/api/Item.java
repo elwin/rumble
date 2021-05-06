@@ -611,12 +611,14 @@ public interface Item extends Serializable, KryoSerializable {
     }
 
     default int getTypeID() {
-        if (this.isNumeric())
+        if (this.isNull())
             return 1;
-        else if (this.isString() || this.isAnyURI())
+        else if (this.isNumeric())
             return 2;
-        else if (this.isDuration())
+        else if (this.isString() || this.isAnyURI())
             return 3;
+        else if (this.isDuration())
+            return 4;
 
         throw new UnsupportedOperationException("Operation not defined for type " + this.getDynamicType());
     }
