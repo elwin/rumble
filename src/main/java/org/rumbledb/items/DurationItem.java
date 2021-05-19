@@ -219,9 +219,10 @@ public class DurationItem implements Item {
     @Override
     public byte[] serializeBinary() {
         return DecimalGamma.Encode(
-                this.getValue()
-                        .toDurationFrom(new DateTime(1970, 1, 1, 0, 0))
-                        .getMillis())
-                .toBytes();
+            this.getValue()
+                .toDurationFrom(new DateTime(1970, 1, 1, 0, 0))
+                .getMillis()
+        )
+            .toBytes();
     }
 }

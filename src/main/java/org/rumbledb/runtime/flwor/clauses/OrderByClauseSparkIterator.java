@@ -45,7 +45,7 @@ import org.rumbledb.runtime.RuntimeTupleIterator;
 import org.rumbledb.runtime.flwor.FlworDataFrameUtils;
 import org.rumbledb.runtime.flwor.NativeClauseContext;
 import org.rumbledb.runtime.flwor.expression.OrderByClauseAnnotatedChildIterator;
-import org.rumbledb.runtime.flwor.udfs.OrderClauseCreateColumnsUDF;
+import org.rumbledb.runtime.flwor.udfs.BinaryOrderClauseCreateColumnsUDF;
 import org.rumbledb.runtime.flwor.udfs.OrderClauseDetermineTypeUDF;
 import org.rumbledb.types.BuiltinTypesCatalogue;
 
@@ -387,7 +387,7 @@ public class OrderByClauseSparkIterator extends RuntimeTupleIterator {
                 );
             }
 
-            typedFields.add(DataTypes.createStructField(columnName, columnType, true));
+            typedFields.add(DataTypes.createStructField(columnName, DataTypes.BinaryType, true));
 
             OrderByClauseAnnotatedChildIterator expressionWithIterator = this.expressionsWithIterator.get(columnIndex);
             // accessing the created ordering row as "`ordering_columns`.`0-nullEmptyCheckField` (desc)"
@@ -426,7 +426,7 @@ public class OrderByClauseSparkIterator extends RuntimeTupleIterator {
             .udf()
             .register(
                 "createOrderingColumns",
-                new OrderClauseCreateColumnsUDF(
+                new BinaryOrderClauseCreateColumnsUDF(
                         this.expressionsWithIterator,
                         context,
                         inputSchema,
