@@ -21,6 +21,7 @@
 package iq;
 
 import iq.base.AnnotationsTestsBase;
+import org.rumbledb.config.RumbleRuntimeConfiguration;
 import scala.util.Properties;
 
 import org.apache.spark.SparkConf;
@@ -93,6 +94,7 @@ public class RuntimeTests extends AnnotationsTestsBase {
         SparkSessionManager.getInstance().initializeConfigurationAndSession(sparkConfiguration, true);
         SparkSessionManager.COLLECT_ITEM_LIMIT = configuration.getResultSizeCap();
         System.err.println("Spark version: " + SparkSessionManager.getInstance().getJavaSparkContext().version());
+        RumbleRuntimeConfiguration.setUseDecimalGamma(true);
     }
 
     @Test(timeout = 1000000)

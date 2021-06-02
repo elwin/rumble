@@ -52,6 +52,7 @@ public class RumbleRuntimeConfiguration implements Serializable, KryoSerializabl
     private Map<Name, List<Item>> externalVariableValues;
     private Map<Name, String> unparsedExternalVariableValues;
     private boolean checkReturnTypeOfBuiltinFunctions;
+    private static boolean useDecimalGamma = false;
 
     private static final RumbleRuntimeConfiguration defaultConfiguration = new RumbleRuntimeConfiguration();
 
@@ -203,6 +204,8 @@ public class RumbleRuntimeConfiguration implements Serializable, KryoSerializabl
         } else {
             this.checkReturnTypeOfBuiltinFunctions = false;
         }
+
+        RumbleRuntimeConfiguration.useDecimalGamma = this.arguments.containsKey("decimal-gamma");
     }
 
     public boolean getOverwrite() {
@@ -318,6 +321,14 @@ public class RumbleRuntimeConfiguration implements Serializable, KryoSerializabl
     public boolean isLocal() {
         String masterConfig = SparkSessionManager.getInstance().getJavaSparkContext().getConf().get("spark.master");
         return masterConfig.contains("local");
+    }
+
+    public static boolean getUseDecimalGamma() {
+        return RumbleRuntimeConfiguration.useDecimalGamma;
+    }
+
+    public static void setUseDecimalGamma(boolean yes) {
+        RumbleRuntimeConfiguration.useDecimalGamma = yes;
     }
 
     @Override

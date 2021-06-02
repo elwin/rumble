@@ -22,11 +22,13 @@ package org.rumbledb.runtime.flwor.clauses;
 
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import org.apache.spark.sql.api.java.UDF1;
 import org.apache.spark.sql.types.DataType;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.rumbledb.api.Item;
+import org.rumbledb.config.RumbleRuntimeConfiguration;
 import org.rumbledb.context.DynamicContext;
 import org.rumbledb.context.Name;
 import org.rumbledb.exceptions.ExceptionMetadata;
@@ -46,6 +48,7 @@ import org.rumbledb.runtime.flwor.FlworDataFrameUtils;
 import org.rumbledb.runtime.flwor.NativeClauseContext;
 import org.rumbledb.runtime.flwor.expression.OrderByClauseAnnotatedChildIterator;
 import org.rumbledb.runtime.flwor.udfs.BinaryOrderClauseCreateColumnsUDF;
+import org.rumbledb.runtime.flwor.udfs.OrderClauseCreateColumnsUDF;
 import org.rumbledb.runtime.flwor.udfs.OrderClauseDetermineTypeUDF;
 import org.rumbledb.types.BuiltinTypesCatalogue;
 
@@ -387,7 +390,13 @@ public class OrderByClauseSparkIterator extends RuntimeTupleIterator {
                 );
             }
 
-            typedFields.add(DataTypes.createStructField(columnName, DataTypes.BinaryType, true));
+            typedFields.add(
+                DataTypes.createStructField(
+                    columnName,
+                    RumbleRuntimeConfiguration.getUseDecimalGamma() ? DataTypes.BinaryType : columnType,
+                    true
+                )
+            );
 
             OrderByClauseAnnotatedChildIterator expressionWithIterator = this.expressionsWithIterator.get(columnIndex);
             // accessing the created ordering row as "`ordering_columns`.`0-nullEmptyCheckField` (desc)"
@@ -422,17 +431,26 @@ public class OrderByClauseSparkIterator extends RuntimeTupleIterator {
             }
         }
 
+        UDF1<Row, Row> orderingUDF = RumbleRuntimeConfiguration.getUseDecimalGamma()
+            ? new BinaryOrderClauseCreateColumnsUDF(
+                    this.expressionsWithIterator,
+                    context,
+                    inputSchema,
+                    typesForAllColumns,
+                    UDFcolumns
+            )
+            : new OrderClauseCreateColumnsUDF(
+                    this.expressionsWithIterator,
+                    context,
+                    inputSchema,
+                    typesForAllColumns,
+                    UDFcolumns
+            );
         df.sparkSession()
             .udf()
             .register(
                 "createOrderingColumns",
-                new BinaryOrderClauseCreateColumnsUDF(
-                        this.expressionsWithIterator,
-                        context,
-                        inputSchema,
-                        typesForAllColumns,
-                        UDFcolumns
-                ),
+                orderingUDF,
                 DataTypes.createStructType(typedFields)
             );
 
