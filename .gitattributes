@@ -3,3 +3,4 @@ src/test/resources/datasets/movies.json filter=lfs diff=lfs merge=lfs -text
 src/test/resources/datasets/students.json filter=lfs diff=lfs merge=lfs -text
 src/test/resources/datasets/confusion filter=lfs diff=lfs merge=lfs -text
 src/test/resources/datasets/ filter=lfs diff=lfs merge=lfs -text
+src/test/resources/datasets/confusion/confusion-2014-03-02.json filter=lfs diff=lfs merge=lfs -text

@@ -31,10 +31,7 @@ import com.esotericsoftware.kryo.io.Output;
 import sparksoniq.spark.SparkSessionManager;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RumbleRuntimeConfiguration implements Serializable, KryoSerializable {
 
@@ -58,6 +55,7 @@ public class RumbleRuntimeConfiguration implements Serializable, KryoSerializabl
 
     public RumbleRuntimeConfiguration() {
         this.arguments = new HashMap<>();
+        this.allowedPrefixes = new ArrayList<>();
     }
 
     public RumbleRuntimeConfiguration(String[] args) {
@@ -323,8 +321,14 @@ public class RumbleRuntimeConfiguration implements Serializable, KryoSerializabl
         return masterConfig.contains("local");
     }
 
+    // I know, horrible design to make those methods static,
+    // however, for the current version good enough
     public static boolean getUseDecimalGamma() {
         return RumbleRuntimeConfiguration.useDecimalGamma;
+    }
+
+    public static void setUseDecimalGamma() {
+        setUseDecimalGamma(true);
     }
 
     public static void setUseDecimalGamma(boolean yes) {

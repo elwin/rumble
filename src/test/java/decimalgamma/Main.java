@@ -1,5 +1,6 @@
 package decimalgamma;
 
+import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.spark.SparkConf;
 import org.rumbledb.api.Item;
 import org.rumbledb.api.Rumble;
@@ -8,12 +9,18 @@ import org.rumbledb.config.RumbleRuntimeConfiguration;
 import scala.util.Properties;
 import sparksoniq.spark.SparkSessionManager;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 public class Main {
     public static final String javaVersion = System.getProperty("java.version");
     public static final String scalaVersion = Properties.scalaPropOrElse("version.number", "unknown");
     protected static final RumbleRuntimeConfiguration configuration = new RumbleRuntimeConfiguration();
+    protected static Rumble rumble;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         System.err.println("Java version: " + javaVersion);
         System.err.println("Scala version: " + scalaVersion);
 
@@ -31,12 +38,34 @@ public class Main {
         SparkSessionManager.COLLECT_ITEM_LIMIT = configuration.getResultSizeCap();
         System.err.println("Spark version: " + SparkSessionManager.getInstance().getJavaSparkContext().version());
 
-        Rumble rumble = new Rumble(configuration);
-        SequenceOfItems sequence = rumble.runQuery("for $a in (1, 2, 3) return $a");
+        rumble = new Rumble(configuration);
+        RumbleRuntimeConfiguration.setUseDecimalGamma();
+
+        // String query = "count(json-file(\"src/test/resources/datasets/students.json\"))";
+        // String query = "for $i in json-file(\"src/test/resources/datasets/confusion/confusion-2014-03-02.json\")
+        // group by $i.guess return $i.guess";
+
+        String path = "src/test/resources/benchmark/queries/query.jq";
+
+        String query = new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+
+
+        long duration = run_query(query);
+        System.out.println(DurationFormatUtils.formatDurationHMS(duration));
+    }
+
+    public static long run_query(String query) {
+        long startTime = System.currentTimeMillis();
+
+        SequenceOfItems sequence = rumble.runQuery(query);
         sequence.open();
 
         while (sequence.hasNext()) {
             Item next = sequence.next();
         }
+
+        sequence.close();
+
+        return System.currentTimeMillis() - startTime;
     }
 }
