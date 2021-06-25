@@ -1,4 +1,5 @@
-package decimalgamma;
+package org.rumbledb.benchmark;
+
 
 import org.apache.commons.cli.*;
 import org.apache.commons.lang.time.DurationFormatUtils;
