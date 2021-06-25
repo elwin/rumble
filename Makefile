@@ -6,3 +6,6 @@ test:
 
 build:
 	mvn clean compile assembly:single
+
+benchmark:
+	./benchmark.sh

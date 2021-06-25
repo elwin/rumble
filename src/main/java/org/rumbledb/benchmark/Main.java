@@ -1,9 +1,10 @@
 package org.rumbledb.benchmark;
 
-
 import org.apache.commons.cli.*;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.spark.SparkConf;
+import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 import org.rumbledb.api.Item;
 import org.rumbledb.api.Rumble;
 import org.rumbledb.api.SequenceOfItems;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
 
 enum RunType {
     DEFAULT, DECIMAL_GAMMA, DATA_FRAME
@@ -28,6 +30,13 @@ public class Main {
     protected static Rumble rumble;
 
     public static void main(String[] args) throws IOException, ParseException {
+
+        // TODO
+        // - disable logger
+        // - run benchmarks with different queries
+
+        Logger.getRootLogger().setLevel(Level.OFF);
+        java.util.logging.Logger.getGlobal().setLevel(java.util.logging.Level.OFF);
 
         Options options = new Options();
         options.addOption(
@@ -45,7 +54,7 @@ public class Main {
                 .builder("t")
                 .longOpt("type")
                 .hasArg(true)
-                .desc("Set type of execution {d, dg, df}")
+                .desc("Set type of execution {decimalgamma, dataframe, default}")
                 .build()
         );
 
@@ -56,12 +65,13 @@ public class Main {
 
         RunType t;
         switch (cmd.getOptionValue("type")) {
-            case "dg":
+            case "decimalgamma":
                 t = RunType.DECIMAL_GAMMA;
                 break;
-            case "df":
+            case "dataframe":
                 t = RunType.DATA_FRAME;
                 break;
+            case "default":
             default:
                 t = RunType.DEFAULT;
                 break;
@@ -71,8 +81,8 @@ public class Main {
     }
 
     private static void do_something(String path, RunType type) throws IOException {
-        System.err.println("Java version: " + javaVersion);
-        System.err.println("Scala version: " + scalaVersion);
+        // System.err.println("Java version: " + javaVersion);
+        // System.err.println("Scala version: " + scalaVersion);
 
         SparkConf sparkConfiguration = new SparkConf();
         sparkConfiguration.setMaster("local[*]");
@@ -113,6 +123,7 @@ public class Main {
 
         while (sequence.hasNext()) {
             Item next = sequence.next();
+            // System.out.println(next);
         }
 
         sequence.close();
