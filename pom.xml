@@ -79,16 +79,25 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.1.1</version><!--$NO-MVN-MAN-VER$-->
+                <!--
+                    Replaced the CLI build with the benchmark build
+                    because I was unable to create multiple assemblies
+
+                    Helpful articles (but didn't solve my issue entirely):
+                    https://stackoverflow.com/a/15799254/3931419
+                    https://stackoverflow.com/a/13399639/3931419
+                 -->
                 <configuration>
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>org.rumbledb.cli.Main</mainClass>
+                            <mainClass>org.rumbledb.benchmark.Main</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
+                    <finalName>benchmark-rumble</finalName>
                 </configuration>
             </plugin>
             <plugin>

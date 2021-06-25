@@ -20,6 +20,7 @@ enum RunType {
     DEFAULT, DECIMAL_GAMMA, DATA_FRAME
 }
 
+
 public class Main {
     public static final String javaVersion = System.getProperty("java.version");
     public static final String scalaVersion = Properties.scalaPropOrElse("version.number", "unknown");
@@ -29,7 +30,8 @@ public class Main {
     public static void main(String[] args) throws IOException, ParseException {
 
         Options options = new Options();
-        options.addOption(Option
+        options.addOption(
+            Option
                 .builder("f")
                 .longOpt("file")
                 .desc("path of query file")
@@ -38,7 +40,8 @@ public class Main {
                 .build()
         );
 
-        options.addOption(Option
+        options.addOption(
+            Option
                 .builder("t")
                 .longOpt("type")
                 .hasArg(true)
