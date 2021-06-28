@@ -1,11 +1,11 @@
 EXE="target/benchmark-rumble-jar-with-dependencies.jar"
 TYPES=("default" "decimalgamma" "dataframe")
-QUERIES=("students" "confusion" "confusion_g" "confusion_o")
+QUERIES=("students" "confusion" "confusion_g" "confusion_o" "git" "git_g" "git_o")
 
 for QUERY in "${QUERIES[@]}"; do
   RESULT_PATH="results/${QUERY}.csv"
 
-  echo "type,duration (ms)" >"$RESULT_PATH"
+  echo "optimization,duration (ms)" >"$RESULT_PATH"
 
   for TYPE in "${TYPES[@]}"; do
     DURATION=$(java -jar $EXE --type "${TYPE}" --file "src/test/resources/benchmark/queries/${QUERY}.jq" | xargs)

@@ -41,7 +41,7 @@ public class Main {
     }
 
     private static RunType parseType(CommandLine cmd) {
-        switch (cmd.getOptionValue("type")) {
+        switch (cmd.getOptionValue("type", "default")) {
             case "decimalgamma":
                 return RunType.DECIMAL_GAMMA;
             case "dataframe":
