@@ -3,7 +3,7 @@ TYPES=("default" "decimalgamma" "dataframe")
 QUERIES=("students" "confusion" "confusion_g" "confusion_o")
 
 for QUERY in "${QUERIES[@]}"; do
-  RESULT_PATH="results/${QUERY}"
+  RESULT_PATH="results/${QUERY}.csv"
 
   echo "type,duration (ms)" >"$RESULT_PATH"
 
