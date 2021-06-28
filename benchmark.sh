@@ -1,5 +1,5 @@
 EXE="target/benchmark-rumble-jar-with-dependencies.jar"
-TYPES=("default" "decimalgamma" "dataframe")
+TYPES=("default" "decimalgamma")
 QUERIES=("students" "confusion" "confusion_g" "confusion_o" "git" "git_g" "git_o")
 
 for QUERY in "${QUERIES[@]}"; do
