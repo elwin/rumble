@@ -1,10 +1,7 @@
 package org.rumbledb.benchmark;
 
 import org.apache.commons.cli.*;
-import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.spark.SparkConf;
-import org.apache.log4j.Logger;
-import org.apache.log4j.Level;
 import org.rumbledb.api.Item;
 import org.rumbledb.api.Rumble;
 import org.rumbledb.api.SequenceOfItems;
@@ -16,6 +13,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.logging.Logger;
 
 
 enum RunType {
@@ -30,14 +28,31 @@ public class Main {
     protected static Rumble rumble;
 
     public static void main(String[] args) throws IOException, ParseException {
+        CommandLine cmd = processArgs(args);
+        String path = cmd.getOptionValue("file");
+        RunType type = parseType(cmd);
 
-        // TODO
-        // - disable logger
-        // - run benchmarks with different queries
+        startRumble();
+        String query = new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+        query = prepareForBenchmark(type, query);
 
-        Logger.getRootLogger().setLevel(Level.OFF);
-        java.util.logging.Logger.getGlobal().setLevel(java.util.logging.Level.OFF);
+        // System.out.println(DurationFormatUtils.formatDurationHMS(measureQuery(query)));
+        System.out.println(measureQuery(query));
+    }
 
+    private static RunType parseType(CommandLine cmd) {
+        switch (cmd.getOptionValue("type")) {
+            case "decimalgamma":
+                return RunType.DECIMAL_GAMMA;
+            case "dataframe":
+                return RunType.DATA_FRAME;
+            case "default":
+            default:
+                return RunType.DEFAULT;
+        }
+    }
+
+    private static CommandLine processArgs(String[] args) throws ParseException {
         Options options = new Options();
         options.addOption(
             Option
@@ -59,30 +74,12 @@ public class Main {
         );
 
         CommandLineParser parser = new DefaultParser();
-        CommandLine cmd = parser.parse(options, args);
-
-        String path = cmd.getOptionValue("file");
-
-        RunType t;
-        switch (cmd.getOptionValue("type")) {
-            case "decimalgamma":
-                t = RunType.DECIMAL_GAMMA;
-                break;
-            case "dataframe":
-                t = RunType.DATA_FRAME;
-                break;
-            case "default":
-            default:
-                t = RunType.DEFAULT;
-                break;
-        }
-
-        do_something(path, t);
+        return parser.parse(options, args);
     }
 
-    private static void do_something(String path, RunType type) throws IOException {
-        // System.err.println("Java version: " + javaVersion);
-        // System.err.println("Scala version: " + scalaVersion);
+    private static void startRumble() {
+        Logger.getLogger("default").info("Java version: " + javaVersion);
+        Logger.getLogger("default").info("Scala version: " + scalaVersion);
 
         SparkConf sparkConfiguration = new SparkConf();
         sparkConfiguration.setMaster("local[*]");
@@ -99,9 +96,9 @@ public class Main {
         System.err.println("Spark version: " + SparkSessionManager.getInstance().getJavaSparkContext().version());
 
         rumble = new Rumble(configuration);
+    }
 
-        String query = new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
-
+    private static String prepareForBenchmark(RunType type, String query) {
         switch (type) {
             case DECIMAL_GAMMA:
                 RumbleRuntimeConfiguration.setUseDecimalGamma();
@@ -111,11 +108,10 @@ public class Main {
                 break;
         }
 
-        long duration = run_query(query);
-        System.out.println(DurationFormatUtils.formatDurationHMS(duration));
+        return query;
     }
 
-    private static long run_query(String query) {
+    private static long measureQuery(String query) {
         long startTime = System.currentTimeMillis();
 
         SequenceOfItems sequence = rumble.runQuery(query);

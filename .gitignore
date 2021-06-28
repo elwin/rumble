@@ -5,3 +5,6 @@ target/
 
 # for now ignore jsound package
 src/main/java/jsound/
+
+# ignore result files from benchmark
+results
