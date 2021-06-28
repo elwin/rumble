@@ -8,6 +8,10 @@ for QUERY in "${QUERIES[@]}"; do
   echo "optimization,duration (ms)" >"$RESULT_PATH"
 
   for TYPE in "${TYPES[@]}"; do
+    if [[ "${QUERY}" =~ ^git ]] && [ "${TYPE}" == "dataframe" ]; then
+      continue
+    fi
+
     DURATION=$(java -jar $EXE --type "${TYPE}" --file "src/test/resources/benchmark/queries/${QUERY}.jq" | xargs)
     echo "${TYPE},${DURATION}" >>"$RESULT_PATH"
   done
