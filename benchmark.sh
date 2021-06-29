@@ -1,6 +1,7 @@
 EXE="target/benchmark-rumble-jar-with-dependencies.jar"
-TYPES=("default" "decimalgamma")
+TYPES=("decimalgamma" "default")
 QUERIES=("students" "confusion" "confusion_g" "confusion_o" "git" "git_g" "git_o")
+REPETITIONS=5
 
 for QUERY in "${QUERIES[@]}"; do
   RESULT_PATH="results/${QUERY}.csv"
@@ -12,8 +13,11 @@ for QUERY in "${QUERIES[@]}"; do
       continue
     fi
 
-    DURATION=$(java -jar $EXE --type "${TYPE}" --file "src/test/resources/benchmark/queries/${QUERY}.jq" | xargs)
-    echo "${TYPE},${DURATION}" >>"$RESULT_PATH"
+    for ((i = 0; i < "${REPETITIONS}"; i++)); do
+      DURATION=$(java -jar $EXE --type "${TYPE}" --file "src/test/resources/benchmark/queries/${QUERY}.jq" | xargs)
+      echo "${TYPE},${DURATION}" >>"$RESULT_PATH"
+    done
+
   done
 
 done

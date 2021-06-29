@@ -44,13 +44,13 @@ def main():
         except FileNotFoundError:
             continue
 
+        df = df.groupby('optimization').median()
         df['duration (s)'] = df['duration (ms)'] / 1000
-        # df = df.drop(2)
 
         plt = sns.barplot(
             data=df,
             y='duration (s)',
-            x='optimization',
+            x=df.index,
         )
         plt.set_title(benchmark['title'])
         plt.figure.savefig(
