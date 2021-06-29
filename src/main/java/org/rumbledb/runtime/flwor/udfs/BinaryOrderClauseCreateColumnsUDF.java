@@ -38,6 +38,7 @@ import org.rumbledb.types.ItemType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class BinaryOrderClauseCreateColumnsUDF implements UDF1<Row, Row> {
@@ -58,6 +59,20 @@ public class BinaryOrderClauseCreateColumnsUDF implements UDF1<Row, Row> {
     private static int nullOrderIndex = 2; // null is the smallest value except empty sequence(default)
     private static int valueOrderIndex = 3; // values are larger than null and empty sequence(default)
 
+    private static final List<Name> types = Stream.of(
+        BuiltinTypesCatalogue.booleanItem,
+        BuiltinTypesCatalogue.stringItem,
+        BuiltinTypesCatalogue.integerItem,
+        BuiltinTypesCatalogue.doubleItem,
+        BuiltinTypesCatalogue.floatItem,
+        BuiltinTypesCatalogue.decimalItem,
+        BuiltinTypesCatalogue.durationItem,
+        BuiltinTypesCatalogue.yearMonthDurationItem,
+        BuiltinTypesCatalogue.dayTimeDurationItem,
+        BuiltinTypesCatalogue.dateTimeItem,
+        BuiltinTypesCatalogue.dateItem,
+        BuiltinTypesCatalogue.timeItem
+    ).map(ItemType::getName).collect(Collectors.toList());
 
     public BinaryOrderClauseCreateColumnsUDF(
             List<OrderByClauseAnnotatedChildIterator> expressionsWithIterator,
@@ -116,43 +131,15 @@ public class BinaryOrderClauseCreateColumnsUDF implements UDF1<Row, Row> {
             // any other atomic type
             this.results.add(valueOrderIndex);
 
-
             // extract type information for the sorting column
             Name typeName = this.sortingKeyTypes.get(expressionIndex);
-            try {
-                if (
-                    Stream.of(
-                        BuiltinTypesCatalogue.booleanItem,
-                        BuiltinTypesCatalogue.stringItem,
-                        BuiltinTypesCatalogue.integerItem,
-                        BuiltinTypesCatalogue.doubleItem,
-                        BuiltinTypesCatalogue.floatItem,
-                        BuiltinTypesCatalogue.decimalItem,
-                        BuiltinTypesCatalogue.durationItem,
-                        BuiltinTypesCatalogue.yearMonthDurationItem,
-                        BuiltinTypesCatalogue.dayTimeDurationItem,
-                        BuiltinTypesCatalogue.dateTimeItem,
-                        BuiltinTypesCatalogue.dateItem,
-                        BuiltinTypesCatalogue.timeItem
-                    )
-                        .map(ItemType::getName)
-                        .noneMatch(typeName::equals)
-                ) {
-                    throw new OurBadException(
-                            "Unexpected ordering type found while creating columns."
-                    );
-                }
-
-                this.results.add(nextItem.getBinaryKey());
-            } catch (RuntimeException e) {
+            if (!types.contains(typeName)) {
                 throw new OurBadException(
-                        "Invalid sort key: cannot compare item of type "
-                            + typeName
-                            + " with item of type "
-                            + nextItem.getDynamicType().toString()
-                            + "."
+                        "Unexpected ordering type found while creating columns."
                 );
             }
+
+            this.results.add(nextItem.getBinaryKey());
         }
     }
 }
