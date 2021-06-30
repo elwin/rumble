@@ -253,6 +253,8 @@ public class OrderByClauseSparkIterator extends RuntimeTupleIterator {
         // Will be conditionally used in non-DecimalGamma setting
         Map<Integer, Name> typesForAllColumns = null;
         String UDFParameters = FlworDataFrameUtils.getUDFParameters(UDFcolumns);
+        df.createOrReplaceTempView("input");
+        df.sparkSession().table("input").cache();
         if (!RumbleRuntimeConfiguration.getUseDecimalGamma()) {
             df.sparkSession()
                 .udf()
@@ -263,8 +265,6 @@ public class OrderByClauseSparkIterator extends RuntimeTupleIterator {
                 );
 
 
-            df.createOrReplaceTempView("input");
-            df.sparkSession().table("input").cache();
             Dataset<Row> columnTypesDf = df.sparkSession()
                 .sql(
                     String.format(
