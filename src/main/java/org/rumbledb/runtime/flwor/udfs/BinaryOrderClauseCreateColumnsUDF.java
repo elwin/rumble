@@ -131,12 +131,14 @@ public class BinaryOrderClauseCreateColumnsUDF implements UDF1<Row, Row> {
             // any other atomic type
             this.results.add(valueOrderIndex);
 
-            // extract type information for the sorting column
-            Name typeName = this.sortingKeyTypes.get(expressionIndex);
-            if (!types.contains(typeName)) {
-                throw new OurBadException(
-                        "Unexpected ordering type found while creating columns."
-                );
+            if (false) {
+                // extract type information for the sorting column
+                Name typeName = this.sortingKeyTypes.get(expressionIndex);
+                if (!types.contains(typeName)) {
+                    throw new OurBadException(
+                            "Unexpected ordering type found while creating columns."
+                    );
+                }
             }
 
             this.results.add(nextItem.getBinaryKey());

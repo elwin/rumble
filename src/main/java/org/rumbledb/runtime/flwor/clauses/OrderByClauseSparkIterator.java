@@ -250,95 +250,99 @@ public class OrderByClauseSparkIterator extends RuntimeTupleIterator {
             return nativeQueryResult;
         }
 
-        df.sparkSession()
-            .udf()
-            .register(
-                "determineOrderingDataType",
-                new OrderClauseDetermineTypeUDF(this.expressionsWithIterator, context, inputSchema, UDFcolumns),
-                DataTypes.createArrayType(DataTypes.StringType)
-            );
-
-
+        // Will be conditionally used in non-DecimalGamma setting
+        Map<Integer, Name> typesForAllColumns = null;
         String UDFParameters = FlworDataFrameUtils.getUDFParameters(UDFcolumns);
+        if (!RumbleRuntimeConfiguration.getUseDecimalGamma()) {
+            df.sparkSession()
+                .udf()
+                .register(
+                    "determineOrderingDataType",
+                    new OrderClauseDetermineTypeUDF(this.expressionsWithIterator, context, inputSchema, UDFcolumns),
+                    DataTypes.createArrayType(DataTypes.StringType)
+                );
 
-        df.createOrReplaceTempView("input");
-        df.sparkSession().table("input").cache();
-        Dataset<Row> columnTypesDf = df.sparkSession()
-            .sql(
-                String.format(
-                    "select distinct(determineOrderingDataType(%s)) as `distinct-types` from input",
-                    UDFParameters
-                )
-            );
-        Object columnTypesObject = columnTypesDf.collect();
-        Row[] columnTypesOfRows = ((Row[]) columnTypesObject);
 
-        if (columnTypesOfRows.length == 0) {
-            // The input is empty, so we output this empty DF again.
-            return df;
-        }
+            df.createOrReplaceTempView("input");
+            df.sparkSession().table("input").cache();
+            Dataset<Row> columnTypesDf = df.sparkSession()
+                .sql(
+                    String.format(
+                        "select distinct(determineOrderingDataType(%s)) as `distinct-types` from input",
+                        UDFParameters
+                    )
+                );
+            Object columnTypesObject = columnTypesDf.collect();
+            Row[] columnTypesOfRows = ((Row[]) columnTypesObject);
 
-        // Every column represents an order by expression
-        // Check that every column contains a matching atomic type in all rows (nulls and empty-sequences are allowed)
-        Map<Integer, Name> typesForAllColumns = new LinkedHashMap<>();
-        for (Row columnTypesOfRow : columnTypesOfRows) {
-            List<Object> columnsTypesOfRowAsList = columnTypesOfRow.getList(0);
-            for (int columnIndex = 0; columnIndex < numberOfOrderingKeys; columnIndex++) {
-                String typeString = (String) columnsTypesOfRowAsList.get(columnIndex);
-                boolean isEmptySequence = typeString.contentEquals(StringFlagForEmptySequence);
-                if (!isEmptySequence) {
-                    Name columnType = BuiltinTypesCatalogue.getItemTypeByName(
-                        Name.createVariableInDefaultTypeNamespace(typeString)
-                    ).getName();
-                    if (
-                        !columnType.equals(BuiltinTypesCatalogue.nullItem.getName())
-                    ) {
-                        Name currentColumnType = typesForAllColumns.get(columnIndex);
-                        if (currentColumnType == null) {
-                            typesForAllColumns.put(columnIndex, columnType);
-                        } else if (
-                            (currentColumnType.equals(BuiltinTypesCatalogue.integerItem.getName())
-                                || currentColumnType.equals(BuiltinTypesCatalogue.doubleItem.getName())
-                                || currentColumnType.equals(BuiltinTypesCatalogue.floatItem.getName())
-                                || currentColumnType.equals(BuiltinTypesCatalogue.decimalItem.getName()))
-                                && (columnType.equals(BuiltinTypesCatalogue.integerItem.getName())
-                                    || columnType.equals(BuiltinTypesCatalogue.doubleItem.getName())
-                                    || columnType.equals(BuiltinTypesCatalogue.floatItem.getName())
-                                    || columnType.equals(BuiltinTypesCatalogue.decimalItem.getName()))
+            if (columnTypesOfRows.length == 0) {
+                // The input is empty, so we output this empty DF again.
+                return df;
+            }
+
+            // Every column represents an order by expression
+            // Check that every column contains a matching atomic type in all rows (nulls and empty-sequences are
+            // allowed)
+            typesForAllColumns = new LinkedHashMap<>();
+            for (Row columnTypesOfRow : columnTypesOfRows) {
+                List<Object> columnsTypesOfRowAsList = columnTypesOfRow.getList(0);
+                for (int columnIndex = 0; columnIndex < numberOfOrderingKeys; columnIndex++) {
+                    String typeString = (String) columnsTypesOfRowAsList.get(columnIndex);
+                    boolean isEmptySequence = typeString.contentEquals(StringFlagForEmptySequence);
+                    if (!isEmptySequence) {
+                        Name columnType = BuiltinTypesCatalogue.getItemTypeByName(
+                            Name.createVariableInDefaultTypeNamespace(typeString)
+                        ).getName();
+                        if (
+                            !columnType.equals(BuiltinTypesCatalogue.nullItem.getName())
                         ) {
-                            // the numeric type calculation is identical to Item::getNumericResultType()
-                            if (
-                                currentColumnType.equals(BuiltinTypesCatalogue.doubleItem.getName())
-                                    || columnType.equals(BuiltinTypesCatalogue.doubleItem.getName())
-                            ) {
-                                typesForAllColumns.put(columnIndex, BuiltinTypesCatalogue.floatItem.getName());
+                            Name currentColumnType = typesForAllColumns.get(columnIndex);
+                            if (currentColumnType == null) {
+                                typesForAllColumns.put(columnIndex, columnType);
                             } else if (
-                                currentColumnType.equals(BuiltinTypesCatalogue.floatItem.getName())
-                                    || columnType.equals(BuiltinTypesCatalogue.floatItem.getName())
+                                (currentColumnType.equals(BuiltinTypesCatalogue.integerItem.getName())
+                                    || currentColumnType.equals(BuiltinTypesCatalogue.doubleItem.getName())
+                                    || currentColumnType.equals(BuiltinTypesCatalogue.floatItem.getName())
+                                    || currentColumnType.equals(BuiltinTypesCatalogue.decimalItem.getName()))
+                                    && (columnType.equals(BuiltinTypesCatalogue.integerItem.getName())
+                                        || columnType.equals(BuiltinTypesCatalogue.doubleItem.getName())
+                                        || columnType.equals(BuiltinTypesCatalogue.floatItem.getName())
+                                        || columnType.equals(BuiltinTypesCatalogue.decimalItem.getName()))
                             ) {
-                                typesForAllColumns.put(columnIndex, BuiltinTypesCatalogue.doubleItem.getName());
+                                // the numeric type calculation is identical to Item::getNumericResultType()
+                                if (
+                                    currentColumnType.equals(BuiltinTypesCatalogue.doubleItem.getName())
+                                        || columnType.equals(BuiltinTypesCatalogue.doubleItem.getName())
+                                ) {
+                                    typesForAllColumns.put(columnIndex, BuiltinTypesCatalogue.floatItem.getName());
+                                } else if (
+                                    currentColumnType.equals(BuiltinTypesCatalogue.floatItem.getName())
+                                        || columnType.equals(BuiltinTypesCatalogue.floatItem.getName())
+                                ) {
+                                    typesForAllColumns.put(columnIndex, BuiltinTypesCatalogue.doubleItem.getName());
+                                } else if (
+                                    currentColumnType.equals(BuiltinTypesCatalogue.decimalItem.getName())
+                                        || columnType.equals(BuiltinTypesCatalogue.decimalItem.getName())
+                                ) {
+                                    typesForAllColumns.put(columnIndex, BuiltinTypesCatalogue.decimalItem.getName());
+                                } else {
+                                    // do nothing, type is already set to integer
+                                }
                             } else if (
-                                currentColumnType.equals(BuiltinTypesCatalogue.decimalItem.getName())
-                                    || columnType.equals(BuiltinTypesCatalogue.decimalItem.getName())
+                                (currentColumnType.equals(BuiltinTypesCatalogue.dayTimeDurationItem.getName())
+                                    || currentColumnType.equals(BuiltinTypesCatalogue.yearMonthDurationItem.getName())
+                                    || currentColumnType.equals(BuiltinTypesCatalogue.durationItem.getName()))
+                                    && (columnType.equals(BuiltinTypesCatalogue.dayTimeDurationItem.getName())
+                                        || columnType.equals(BuiltinTypesCatalogue.yearMonthDurationItem.getName())
+                                        || columnType.equals(BuiltinTypesCatalogue.durationItem.getName()))
                             ) {
-                                typesForAllColumns.put(columnIndex, BuiltinTypesCatalogue.decimalItem.getName());
-                            } else {
-                                // do nothing, type is already set to integer
+                                typesForAllColumns.put(columnIndex, BuiltinTypesCatalogue.durationItem.getName());
+                            } else if (!currentColumnType.equals(columnType)) {
+                                throw new UnexpectedTypeException(
+                                        "Order by variable must contain values of a single type.",
+                                        getMetadata()
+                                );
                             }
-                        } else if (
-                            (currentColumnType.equals(BuiltinTypesCatalogue.dayTimeDurationItem.getName())
-                                || currentColumnType.equals(BuiltinTypesCatalogue.yearMonthDurationItem.getName())
-                                || currentColumnType.equals(BuiltinTypesCatalogue.durationItem.getName()))
-                                && (columnType.equals(BuiltinTypesCatalogue.dayTimeDurationItem.getName())
-                                    || columnType.equals(BuiltinTypesCatalogue.yearMonthDurationItem.getName())
-                                    || columnType.equals(BuiltinTypesCatalogue.durationItem.getName()))
-                        ) {
-                            typesForAllColumns.put(columnIndex, BuiltinTypesCatalogue.durationItem.getName());
-                        } else if (!currentColumnType.equals(columnType)) {
-                            throw new UnexpectedTypeException(
-                                    "Order by variable must contain values of a single type.",
-                                    getMetadata()
-                            );
                         }
                     }
                 }
@@ -349,10 +353,9 @@ public class OrderByClauseSparkIterator extends RuntimeTupleIterator {
         List<StructField> typedFields = new ArrayList<>(); // Determine the return type for ordering UDF
         StringBuilder orderingSQL = new StringBuilder(); // Prepare the SQL statement for the order by query
         String appendedOrderingColumnsName = "ordering_columns";
+        DataType columnType = null;
         for (int columnIndex = 0; columnIndex < numberOfOrderingKeys; columnIndex++) {
-            Name columnTypeString = typesForAllColumns.get(columnIndex);
             String columnName;
-            DataType columnType;
 
             // every expression contains an int column for null/empty check
             columnName = columnIndex + "-nullEmptyCheckField";
@@ -360,35 +363,41 @@ public class OrderByClauseSparkIterator extends RuntimeTupleIterator {
 
             // create fields for the given value types
             columnName = columnIndex + "-valueField";
-            if (columnTypeString == null) {
-                columnType = DataTypes.BooleanType;
-            } else if (columnTypeString.equals(BuiltinTypesCatalogue.booleanItem.getName())) {
-                columnType = DataTypes.BooleanType;
-            } else if (columnTypeString.equals(BuiltinTypesCatalogue.stringItem.getName())) {
-                columnType = DataTypes.StringType;
-            } else if (columnTypeString.equals(BuiltinTypesCatalogue.integerItem.getName())) {
-                columnType = DataTypes.IntegerType;
-            } else if (columnTypeString.equals(BuiltinTypesCatalogue.doubleItem.getName())) {
-                columnType = DataTypes.DoubleType;
-            } else if (columnTypeString.equals(BuiltinTypesCatalogue.floatItem.getName())) {
-                columnType = DataTypes.FloatType;
-            } else if (columnTypeString.equals(BuiltinTypesCatalogue.decimalItem.getName())) {
-                columnType = decimalType;
-                // columnType = DataTypes.createDecimalType();
-            } else if (
-                columnTypeString.equals(BuiltinTypesCatalogue.durationItem.getName())
-                    || columnTypeString.equals(BuiltinTypesCatalogue.yearMonthDurationItem.getName())
-                    || columnTypeString.equals(BuiltinTypesCatalogue.dayTimeDurationItem.getName())
-                    || columnTypeString.equals(BuiltinTypesCatalogue.dateTimeItem.getName())
-                    || columnTypeString.equals(BuiltinTypesCatalogue.dateItem.getName())
-                    || columnTypeString.equals(BuiltinTypesCatalogue.timeItem.getName())
-            ) {
-                columnType = DataTypes.LongType;
-            } else {
-                throw new RumbleException(
-                        "Unexpected ordering type found while determining UDF return type."
-                );
+
+            if (!RumbleRuntimeConfiguration.getUseDecimalGamma()) {
+                Name columnTypeString = typesForAllColumns.get(columnIndex);
+
+                if (columnTypeString == null) {
+                    columnType = DataTypes.BooleanType;
+                } else if (columnTypeString.equals(BuiltinTypesCatalogue.booleanItem.getName())) {
+                    columnType = DataTypes.BooleanType;
+                } else if (columnTypeString.equals(BuiltinTypesCatalogue.stringItem.getName())) {
+                    columnType = DataTypes.StringType;
+                } else if (columnTypeString.equals(BuiltinTypesCatalogue.integerItem.getName())) {
+                    columnType = DataTypes.IntegerType;
+                } else if (columnTypeString.equals(BuiltinTypesCatalogue.doubleItem.getName())) {
+                    columnType = DataTypes.DoubleType;
+                } else if (columnTypeString.equals(BuiltinTypesCatalogue.floatItem.getName())) {
+                    columnType = DataTypes.FloatType;
+                } else if (columnTypeString.equals(BuiltinTypesCatalogue.decimalItem.getName())) {
+                    columnType = decimalType;
+                    // columnType = DataTypes.createDecimalType();
+                } else if (
+                    columnTypeString.equals(BuiltinTypesCatalogue.durationItem.getName())
+                        || columnTypeString.equals(BuiltinTypesCatalogue.yearMonthDurationItem.getName())
+                        || columnTypeString.equals(BuiltinTypesCatalogue.dayTimeDurationItem.getName())
+                        || columnTypeString.equals(BuiltinTypesCatalogue.dateTimeItem.getName())
+                        || columnTypeString.equals(BuiltinTypesCatalogue.dateItem.getName())
+                        || columnTypeString.equals(BuiltinTypesCatalogue.timeItem.getName())
+                ) {
+                    columnType = DataTypes.LongType;
+                } else {
+                    throw new RumbleException(
+                            "Unexpected ordering type found while determining UDF return type."
+                    );
+                }
             }
+            // TODO until here
 
             typedFields.add(
                 DataTypes.createStructField(

@@ -1,2 +1,5 @@
-for $i in ({"id": 1, "type": 1}, {"id": 2, "type": 2})
-return $i.id
+for $i in json-file("src/test/resources/benchmark/datasets/confusion/confusion-2014-03-02.json")
+let $key := $i.date
+group by $key
+order by $key
+return $key
