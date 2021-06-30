@@ -46,18 +46,17 @@ def main():
             continue
 
         df['duration (s)'] = df['duration (ms)'] / 1000
-        df = df.groupby('optimization').agg([np.mean, np.std])
+        df = df.groupby('optimization').agg([np.median, np.mean, np.std])
+        print(df)
 
         plt = sns.barplot(
             data=df['duration (s)'],
-            y='mean',
+            y='median',
             x=df.index,
         )
         plt.set_title(benchmark['title'])
-        plt.figure.savefig(
-            f"{results_dir}/{benchmark['filename']}.pdf",
-            bbox_inches="tight",
-        )
+        plt.figure.savefig(f"{results_dir}/{benchmark['filename']}.pdf", bbox_inches="tight")
+        plt.figure.savefig(f"{results_dir}/{benchmark['filename']}.png", bbox_inches="tight", dpi=300)
         matplotlib.pyplot.close()
 
 
