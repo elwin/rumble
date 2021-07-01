@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 
 
 enum RunType {
-    DEFAULT, DECIMAL_GAMMA, DATA_FRAME
+    DEFAULT, DECIMAL_GAMMA, DECIMAL_GAMMA_LOOSE, DATA_FRAME
 }
 
 
@@ -44,6 +44,8 @@ public class Main {
         switch (cmd.getOptionValue("type", "default")) {
             case "decimalgamma":
                 return RunType.DECIMAL_GAMMA;
+            case "decimalgamma-loose":
+                return RunType.DECIMAL_GAMMA_LOOSE;
             case "dataframe":
                 return RunType.DATA_FRAME;
             case "default":
@@ -56,8 +58,8 @@ public class Main {
         Options options = new Options();
         options.addOption(
             Option
-                .builder("f")
-                .longOpt("file")
+                .builder("q")
+                .longOpt("query")
                 .desc("path of query file")
                 .hasArg(true)
                 .required(true)
@@ -102,7 +104,11 @@ public class Main {
         switch (type) {
             case DECIMAL_GAMMA:
                 RumbleRuntimeConfiguration.setUseDecimalGamma();
+                RumbleRuntimeConfiguration.setUseOrderStrict(true);
                 break;
+            case DECIMAL_GAMMA_LOOSE:
+                RumbleRuntimeConfiguration.setUseDecimalGamma();
+                RumbleRuntimeConfiguration.setUseOrderStrict(false);
             case DATA_FRAME:
                 query = query.replace("json-file", "structured-json-file");
                 break;

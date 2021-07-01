@@ -51,6 +51,8 @@ public class BinaryOrderClauseCreateColumnsUDF implements UDF1<Row, Row> {
 
     private List<Object> results;
 
+    private boolean orderStrict;
+
     // nulls and empty sequences have special ordering captured in the first sorting column
     // if non-null, non-empty-sequence value is given, the second column is used to sort the input
     // indices are assigned to each value type for the first column
@@ -79,13 +81,15 @@ public class BinaryOrderClauseCreateColumnsUDF implements UDF1<Row, Row> {
             DynamicContext context,
             StructType schema,
             Map<Integer, Name> sortingKeyTypes,
-            List<String> columnNames
+            List<String> columnNames,
+            boolean orderStrict
     ) {
         this.dataFrameContext = new DataFrameContext(context, schema, columnNames);
         this.expressionsWithIterator = expressionsWithIterator;
         this.sortingKeyTypes = sortingKeyTypes;
 
         this.results = new ArrayList<>();
+        this.orderStrict = orderStrict;
     }
 
     @Override
@@ -131,7 +135,7 @@ public class BinaryOrderClauseCreateColumnsUDF implements UDF1<Row, Row> {
             // any other atomic type
             this.results.add(valueOrderIndex);
 
-            if (false) {
+            if (this.orderStrict) {
                 // extract type information for the sorting column
                 Name typeName = this.sortingKeyTypes.get(expressionIndex);
                 if (!types.contains(typeName)) {

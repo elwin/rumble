@@ -50,6 +50,7 @@ public class RumbleRuntimeConfiguration implements Serializable, KryoSerializabl
     private Map<Name, String> unparsedExternalVariableValues;
     private boolean checkReturnTypeOfBuiltinFunctions;
     private static boolean useDecimalGamma = false;
+    private static boolean useOrderStrict = true;
 
     private static final RumbleRuntimeConfiguration defaultConfiguration = new RumbleRuntimeConfiguration();
 
@@ -334,6 +335,20 @@ public class RumbleRuntimeConfiguration implements Serializable, KryoSerializabl
     public static void setUseDecimalGamma(boolean yes) {
         RumbleRuntimeConfiguration.useDecimalGamma = yes;
     }
+
+    public static boolean getUseOrderStrict() {
+        return RumbleRuntimeConfiguration.useOrderStrict;
+    }
+
+    public static void setUseOrderStrict() {
+        setUseOrderStrict(true);
+    }
+
+    public static void setUseOrderStrict(boolean yes) {
+        RumbleRuntimeConfiguration.useOrderStrict = yes;
+    }
+
+
 
     @Override
     public String toString() {

@@ -177,8 +177,8 @@ public class OrderByClauseSparkIterator extends RuntimeTupleIterator {
             for (OrderByClauseAnnotatedChildIterator expressionWithIterator : this.expressionsWithIterator) {
                 tupleContext.getVariableValues().removeAllVariables(); // clear the previous variables
                 tupleContext.getVariableValues().setBindingsFromTuple(inputTuple, getMetadata()); // assign new
-                                                                                                  // variables from new
-                                                                                                  // tuple
+                // variables from new
+                // tuple
 
                 RuntimeIterator iterator = expressionWithIterator.getIterator();
                 try {
@@ -255,7 +255,10 @@ public class OrderByClauseSparkIterator extends RuntimeTupleIterator {
         String UDFParameters = FlworDataFrameUtils.getUDFParameters(UDFcolumns);
         df.createOrReplaceTempView("input");
         df.sparkSession().table("input").cache();
-        if (!RumbleRuntimeConfiguration.getUseDecimalGamma()) {
+        if (
+            !RumbleRuntimeConfiguration.getUseDecimalGamma()
+                || RumbleRuntimeConfiguration.getUseOrderStrict()
+        ) {
             df.sparkSession()
                 .udf()
                 .register(
@@ -397,7 +400,6 @@ public class OrderByClauseSparkIterator extends RuntimeTupleIterator {
                     );
                 }
             }
-            // TODO until here
 
             typedFields.add(
                 DataTypes.createStructField(
@@ -446,7 +448,8 @@ public class OrderByClauseSparkIterator extends RuntimeTupleIterator {
                     context,
                     inputSchema,
                     typesForAllColumns,
-                    UDFcolumns
+                    UDFcolumns,
+                    RumbleRuntimeConfiguration.getUseOrderStrict()
             )
             : new OrderClauseCreateColumnsUDF(
                     this.expressionsWithIterator,

@@ -8,3 +8,4 @@ src/main/java/jsound/
 
 # ignore result files from benchmark
 results/*.pdf
+results/*.png

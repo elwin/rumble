@@ -1,6 +1,6 @@
 EXE="target/benchmark-rumble-jar-with-dependencies.jar"
-TYPES=("decimalgamma" "default")
-QUERIES=("students" "confusion" "confusion_g" "confusion_o" "git" "git_g" "git_o")
+TYPES=("decimalgamma" "decimalgamma-loose" "default")
+QUERIES=("git_o" "git_g" "git")
 REPETITIONS=5
 
 for QUERY in "${QUERIES[@]}"; do
@@ -14,7 +14,7 @@ for QUERY in "${QUERIES[@]}"; do
     fi
 
     for ((i = 0; i < "${REPETITIONS}"; i++)); do
-      DURATION=$(java -jar $EXE --type "${TYPE}" --file "src/test/resources/benchmark/queries/${QUERY}.jq" | xargs)
+      DURATION=$(java -jar $EXE --type "${TYPE}" --query "src/test/resources/benchmark/queries/${QUERY}.jq" | xargs)
       echo "${TYPE},${DURATION}" >>"$RESULT_PATH"
     done
 
