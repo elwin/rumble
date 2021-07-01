@@ -29,7 +29,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException, ParseException {
         CommandLine cmd = processArgs(args);
-        String path = cmd.getOptionValue("file");
+        String path = cmd.getOptionValue("query");
         RunType type = parseType(cmd);
 
         startRumble();
