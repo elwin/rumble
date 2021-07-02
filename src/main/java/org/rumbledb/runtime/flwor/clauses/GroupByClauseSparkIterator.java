@@ -333,6 +333,7 @@ public class GroupByClauseSparkIterator extends RuntimeTupleIterator {
                 DynamicContext.VariableDependency.FULL
             );
             if (RumbleRuntimeConfiguration.getUseDecimalGamma()) {
+                typedFields.add(DataTypes.createStructField(columnIndex + "-type-id", DataTypes.IntegerType, false));
                 typedFields.add(DataTypes.createStructField(String.valueOf(columnIndex), DataTypes.BinaryType, true));
                 continue;
             }

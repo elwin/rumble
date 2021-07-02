@@ -635,6 +635,7 @@ public interface Item extends Serializable, KryoSerializable {
                 || this.isDateTime()
                 || this.isDate()
                 || this.isDayTimeDuration()
+                || this.isTime()
         )
             return 5;
 

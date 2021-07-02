@@ -89,6 +89,7 @@ public class BinaryGroupClauseCreateColumnsUDF implements UDF1<Row, Row> {
             }
 
             if (items.size() == 0) {
+                this.results.add(0); // empty list type
                 this.results.add(new byte[] {});
                 continue;
             }
@@ -108,6 +109,7 @@ public class BinaryGroupClauseCreateColumnsUDF implements UDF1<Row, Row> {
             );
         }
 
+        this.results.add(nextItem.getTypeID());
         this.results.add(nextItem.getBinaryKey());
     }
 }

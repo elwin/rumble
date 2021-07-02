@@ -38,11 +38,6 @@ public class DateItem implements Item {
     }
 
     @Override
-    public int getTypeID() {
-        return 6;
-    }
-
-    @Override
     public boolean equals(Object otherItem) {
         if (otherItem instanceof Item) {
             long c = ComparisonIterator.compareItems(

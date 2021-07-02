@@ -34,10 +34,6 @@ public class HexBinaryItem implements Item {
         this.value = parseHexBinaryString(stringValue);
     }
 
-    @Override
-    public int getTypeID() {
-        return 8;
-    }
 
     @Override
     public boolean equals(Object otherItem) {

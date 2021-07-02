@@ -48,11 +48,6 @@ public class BooleanItem implements Item {
     }
 
     @Override
-    public int getTypeID() {
-        return 5;
-    }
-
-    @Override
     public boolean getBooleanValue() {
         return this.getValue();
     }

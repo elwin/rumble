@@ -39,11 +39,6 @@ public class TimeItem implements Item {
     }
 
     @Override
-    public int getTypeID() {
-        return 9;
-    }
-
-    @Override
     public boolean equals(Object otherItem) {
         if (otherItem instanceof Item) {
             long c = ComparisonIterator.compareItems(
