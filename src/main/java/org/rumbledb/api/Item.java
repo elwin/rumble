@@ -24,18 +24,18 @@ import com.esotericsoftware.kryo.KryoSerializable;
 
 /**
  * An instance of this class is an item in the JSONiq data model.
- *
+ * <p>
  * JSONiq manipulates sequences of items.
- *
+ * <p>
  * All calls should be made via this interface. Objects of type Item should never be cast to a subclass (in a subsequent
  * version,
  * we will make the classes implementing this interface visible only at the package level).
- *
+ * <p>
  * An item can be structured or atomic or a function.
- *
+ * <p>
  * Structured items include objects and arrays. Objects are mappings from strings (keys) to items. Arrays are ordered
  * lists of items.
- *
+ * <p>
  * Atomic items have a lexical value and a type. Rumble does not support all atomic types yet.
  *
  * @author Ghislain Fourny, Stefan Irimescu, Can Berker Cikis
@@ -397,7 +397,7 @@ public interface Item extends Serializable, KryoSerializable {
 
     /**
      * Returns the dynamic type of the item (only for error message purposes).
-     * 
+     *
      * @return the dynamic type as an item type.
      */
     default ItemType getDynamicType() {
@@ -406,7 +406,7 @@ public interface Item extends Serializable, KryoSerializable {
 
     /**
      * Returns the identifier (name and arity) of the function, if it is a function item.
-     * 
+     *
      * @return the function identifier.
      */
     default FunctionIdentifier getIdentifier() {
@@ -415,7 +415,7 @@ public interface Item extends Serializable, KryoSerializable {
 
     /**
      * Returns the names of the parameters of the function, if it is a function item.
-     * 
+     *
      * @return the function parameter names.
      */
     default List<Name> getParameterNames() {
@@ -424,7 +424,7 @@ public interface Item extends Serializable, KryoSerializable {
 
     /**
      * Returns the signature of the function, if it is a function item.
-     * 
+     *
      * @return the function signature.
      */
     default FunctionSignature getSignature() {
@@ -433,7 +433,7 @@ public interface Item extends Serializable, KryoSerializable {
 
     /**
      * Returns the body iterator, if it is a function item.
-     * 
+     *
      * @return the function signature.
      */
     default public RuntimeIterator getBodyIterator() {
@@ -442,7 +442,7 @@ public interface Item extends Serializable, KryoSerializable {
 
     /**
      * Returns the local variable bindings, if it is a function item.
-     * 
+     *
      * @return the function signature.
      */
     default public Map<Name, List<Item>> getLocalVariablesInClosure() {
@@ -451,7 +451,7 @@ public interface Item extends Serializable, KryoSerializable {
 
     /**
      * Returns the RDD variable bindings, if it is a function item.
-     * 
+     *
      * @return the function signature.
      */
     default public Map<Name, JavaRDD<Item>> getRDDVariablesInClosure() {
@@ -460,7 +460,7 @@ public interface Item extends Serializable, KryoSerializable {
 
     /**
      * Returns the DataFrame variable bindings, if it is a function item.
-     * 
+     *
      * @return the function signature.
      */
     default public Map<Name, Dataset<Row>> getDFVariablesInClosure() {
@@ -469,7 +469,7 @@ public interface Item extends Serializable, KryoSerializable {
 
     /**
      * Returns the module dynamic context, if it is a function item.
-     * 
+     *
      * @return the function signature.
      */
     default public DynamicContext getModuleDynamicContext() {
@@ -613,22 +613,35 @@ public interface Item extends Serializable, KryoSerializable {
     default int getTypeID() {
         if (this.isNull())
             return 1;
-        else if (this.isNumeric())
+        else if (this.isBoolean())
             return 2;
-        else if (this.isString() || this.isAnyURI())
+        else if (
+            this.isString()
+                || this.isAnyURI()
+                || this.isHexBinary()
+                || this.isBase64Binary()
+        )
             return 3;
-        else if (this.isDuration())
+        else if (
+            this.isInt()
+                || this.isInteger()
+                || this.isDecimal()
+                || this.isFloat()
+                || this.isDouble()
+        )
             return 4;
+        else if (
+            this.isDuration()
+                || this.isDateTime()
+                || this.isDate()
+                || this.isDayTimeDuration()
+        )
+            return 5;
 
         throw new UnsupportedOperationException("Operation not defined for type " + this.getDynamicType());
     }
 
     default byte[] getBinaryKey() {
-        byte[] b = this.serializeBinary();
-        byte[] out = new byte[1 + b.length];
-        out[0] = (byte) this.getTypeID();
-        System.arraycopy(b, 0, out, 1, b.length);
-
-        return out;
+        return this.serializeBinary();
     }
 }

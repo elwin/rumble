@@ -210,7 +210,7 @@ public class ComparisonIterator extends AtMostOneItemLocalRuntimeIterator {
         if (!left.isAtomic() || !right.isAtomic())
             return false;
 
-        return left.getBinaryKey()[0] == right.getBinaryKey()[0];
+        return left.getTypeID() == right.getTypeID();
     }
 
     public static long compareItems(
