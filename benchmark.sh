@@ -1,6 +1,6 @@
 EXE="target/benchmark-rumble-jar-with-dependencies.jar"
 TYPES=("decimalgamma" "decimalgamma-loose" "default")
-QUERIES=("git_o" "git_g" "git")
+QUERIES=("git_o" "git_g" "git" "confusion_o" "confusion_g" "confusion" "students")
 REPETITIONS=5
 
 for QUERY in "${QUERIES[@]}"; do

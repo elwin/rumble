@@ -1,4 +1,5 @@
-for $i in json-file("src/test/resources/benchmark/datasets/confusion/confusion-2014-03-02.json")
-let $key := date($i.date)
+for $i in json-file("src/test/resources/benchmark/datasets/git-archive.json")
+let $key := $i.actor.id
+group by $key
 order by $key
-return $key
+return {"actor": $key, "count": count($i)}

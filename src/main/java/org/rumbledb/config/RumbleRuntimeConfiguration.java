@@ -348,8 +348,6 @@ public class RumbleRuntimeConfiguration implements Serializable, KryoSerializabl
         RumbleRuntimeConfiguration.useOrderStrict = yes;
     }
 
-
-
     @Override
     public String toString() {
         String result = "";

@@ -1,11 +1,16 @@
 optimization,duration (ms)
-decimalgamma,25870
-decimalgamma,26746
-decimalgamma,24421
-decimalgamma,20326
-decimalgamma,23931
-default,24914
-default,26987
-default,31659
-default,26397
-default,24924
+decimalgamma,26794
+decimalgamma,23752
+decimalgamma,24812
+decimalgamma,24313
+decimalgamma,23223
+decimalgamma-loose,22022
+decimalgamma-loose,21519
+decimalgamma-loose,17738
+decimalgamma-loose,18513
+decimalgamma-loose,17549
+default,21518
+default,19777
+default,19983
+default,20343
+default,20015

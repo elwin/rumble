@@ -49,8 +49,11 @@ public class Main {
             case "dataframe":
                 return RunType.DATA_FRAME;
             case "default":
-            default:
                 return RunType.DEFAULT;
+            default:
+                throw new RuntimeException(
+                        "Supplied wrong type, must be one of {decimalgamma, decimalgagmma-loose, dataframe, default}"
+                );
         }
     }
 
@@ -105,16 +108,18 @@ public class Main {
             case DECIMAL_GAMMA:
                 RumbleRuntimeConfiguration.setUseDecimalGamma();
                 RumbleRuntimeConfiguration.setUseOrderStrict(true);
-                break;
+                return query;
             case DECIMAL_GAMMA_LOOSE:
                 RumbleRuntimeConfiguration.setUseDecimalGamma();
                 RumbleRuntimeConfiguration.setUseOrderStrict(false);
+                return query;
             case DATA_FRAME:
-                query = query.replace("json-file", "structured-json-file");
-                break;
+                return query.replace("json-file", "structured-json-file");
+            case DEFAULT:
+                return query;
         }
 
-        return query;
+        throw new RuntimeException("no type set");
     }
 
     private static long measureQuery(String query) {
