@@ -610,33 +610,39 @@ public interface Item extends Serializable, KryoSerializable {
         throw new UnsupportedOperationException("Operation not defined for type " + this.getDynamicType());
     }
 
+    default int getOrderID() {
+        if (this.isNull())
+            return 10;
+        if (this.isNumeric())
+            return 11;
+        if (this.isString() || this.isAnyURI())
+            return 12;
+        if (this.isBinary())
+            return 14;
+        if (this.isBoolean())
+            return 15;
+        if (this.isTime())
+            return 16;
+        if (this.isDuration() || this.isDayTimeDuration() || this.isYearMonthDuration())
+            return 17;
+        if (this.isDateTime())
+            return 18;
+        if (this.isDate())
+            return 19;
+
+        throw new UnsupportedOperationException("Operation not defined for type " + this.getDynamicType());
+    }
+
     default int getTypeID() {
         if (this.isNull())
             return 1;
-        else if (this.isBoolean())
+        if (this.isBoolean())
             return 2;
-        else if (
-            this.isString()
-                || this.isAnyURI()
-                || this.isHexBinary()
-                || this.isBase64Binary()
-        )
+        if (this.isString() || this.isAnyURI() || this.isBinary())
             return 3;
-        else if (
-            this.isInt()
-                || this.isInteger()
-                || this.isDecimal()
-                || this.isFloat()
-                || this.isDouble()
-        )
+        if (this.isNumeric())
             return 4;
-        else if (
-            this.isDuration()
-                || this.isDateTime()
-                || this.isDate()
-                || this.isDayTimeDuration()
-                || this.isTime()
-        )
+        if (this.isDuration() || this.isDateTime() || this.isDate() || this.isDayTimeDuration() || this.isTime())
             return 5;
 
         throw new UnsupportedOperationException("Operation not defined for type " + this.getDynamicType());

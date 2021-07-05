@@ -133,7 +133,7 @@ public class BinaryOrderClauseCreateColumnsUDF implements UDF1<Row, Row> {
             this.results.add(null); // placeholder for valueColumn(2nd column)
         } else {
             // any other atomic type
-            this.results.add(valueOrderIndex);
+            this.results.add(nextItem.getOrderID());
 
             if (this.orderStrict) {
                 // extract type information for the sorting column

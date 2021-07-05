@@ -176,7 +176,7 @@ public class ComparisonIterator extends AtMostOneItemLocalRuntimeIterator {
         }
 
         long comparison = compareItems(left, right, this.comparisonOperator, getMetadata());
-        if (comparison == -Long.MIN_VALUE) {
+        if (comparison == Long.MIN_VALUE) {
             throw new UnexpectedTypeException(
                     " \""
                         + this.comparisonOperator
@@ -210,7 +210,7 @@ public class ComparisonIterator extends AtMostOneItemLocalRuntimeIterator {
         if (!left.isAtomic() || !right.isAtomic())
             return false;
 
-        return left.getTypeID() == right.getTypeID();
+        return left.getOrderID() == right.getOrderID();
     }
 
     public static long compareItems(
