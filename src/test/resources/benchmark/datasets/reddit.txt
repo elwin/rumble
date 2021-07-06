@@ -1,0 +1,6 @@
+The following page contains many different data-dumps from Reddit. There are dumps in various sizes, probably any of
+them should work. We tested the RC_2015-01.bz2 dataset.
+
+
+https://files.pushshift.io/reddit/comments/
+https://files.pushshift.io/reddit/comments/RC_2015-01.bz2
