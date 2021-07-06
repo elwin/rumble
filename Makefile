@@ -15,6 +15,7 @@ copy_resources:
 
 copy:
 	rsync target/benchmark-rumble-jar-with-dependencies.jar rumble:~/rumble/target/benchmark-rumble-jar-with-dependencies.jar
+	rsync -r src/test/resources/benchmark/queries rumble:~/rumble/src/test/resources/benchmark/
 	rsync benchmark.sh rumble:~/rumble
 
 copy_results:

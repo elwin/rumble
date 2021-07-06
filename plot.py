@@ -4,6 +4,15 @@ import seaborn as sns
 import numpy as np
 
 results_dir = 'results'
+colors = [
+    "#E59996",
+    "#B66475",
+    "#6B7FB3",
+    "#56909D",
+    "#E5A47B",
+    "#F5D57C",
+]
+
 benchmarks = [
     {
         "title": "Students: group & order by",
@@ -33,12 +42,25 @@ benchmarks = [
         "title": "Git: order by",
         "filename": "git_o"
     },
+    {
+        "title": "Reddit: group & order by",
+        "filename": "reddit"
+    },
+    {
+        "title": "Reddit: group by",
+        "filename": "reddit_g"
+    },
+    {
+        "title": "Reddit: order by",
+        "filename": "reddit_o"
+    },
 ]
-
-sns.set_theme(style='darkgrid', palette='Set2', font='DejaVu Sans')  # font='CMU Serif'
 
 
 def main():
+    sns.set_theme(style='darkgrid', palette='Set2', font='Helvetica Neue')
+    sns.set_palette(sns.color_palette(colors))
+
     for benchmark in benchmarks:
         try:
             df = pd.read_csv(f"{results_dir}/{benchmark['filename']}.csv")
@@ -54,6 +76,8 @@ def main():
             y='median',
             x=df.index,
         )
+
+        plt.set(xlabel=None, ylabel='median running time (s)')
         plt.set_title(benchmark['title'])
         plt.figure.savefig(f"{results_dir}/{benchmark['filename']}.pdf", bbox_inches="tight")
         plt.figure.savefig(f"{results_dir}/{benchmark['filename']}.png", bbox_inches="tight", dpi=300)
