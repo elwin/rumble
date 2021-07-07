@@ -3,4 +3,5 @@ them should work. We tested the RC_2015-01.bz2 dataset.
 
 
 https://files.pushshift.io/reddit/comments/
-https://files.pushshift.io/reddit/comments/RC_2015-01.bz2
+https://files.pushshift.io/reddit/comments/RC_2007-11.bz2 (202M)
+https://files.pushshift.io/reddit/comments/RC_2009-05.bz2 (680M)
