@@ -2,7 +2,7 @@
 
 EXE="target/benchmark-rumble-jar-with-dependencies.jar"
 TYPES=("decimalgamma" "decimalgamma-loose" "default")
-QUERIES=("hreddit_o" "hreddit_g" "hreddit" "reddit_o" "reddit_g" "reddit")
+QUERIES=("reddit_2_o" "reddit_2_g" "reddit_2" "reddit_3_o" "reddit_3_g" "reddit_3" "reddit_o" "reddit_g" "reddit")
 REPETITIONS=11
 
 for QUERY in "${QUERIES[@]}"; do
@@ -15,7 +15,7 @@ for QUERY in "${QUERIES[@]}"; do
       continue
     fi
 
-    if [[ "${QUERY}" == *_o ]] && [ "${TYPE}" == "decimalgamma-loose" ]; then
+    if [[ "${QUERY}" == *_g ]] && [ "${TYPE}" == "decimalgamma-loose" ]; then
       continue
     fi
 

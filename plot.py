@@ -54,6 +54,30 @@ benchmarks = [
         "title": "Reddit: order by",
         "filename": "reddit_o"
     },
+    {
+        "title": "Reddit: group & order by",
+        "filename": "reddit_2"
+    },
+    {
+        "title": "Reddit: group by",
+        "filename": "reddit_2_g"
+    },
+    {
+        "title": "Reddit: order by",
+        "filename": "reddit_2_o"
+    },
+    {
+        "title": "Reddit: group & order by",
+        "filename": "reddit_3"
+    },
+    {
+        "title": "Reddit: group by",
+        "filename": "reddit_3_g"
+    },
+    {
+        "title": "Reddit: order by",
+        "filename": "reddit_3_o"
+    },
 ]
 
 
