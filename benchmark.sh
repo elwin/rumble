@@ -1,8 +1,8 @@
 #!/bin/bash
 
 EXE="target/benchmark-rumble-jar-with-dependencies.jar"
-TYPES=("decimalgamma" "decimalgamma-loose" "default" "dataframe")
-QUERIES=("git_o" "git_g" "git" "reddit_o" "reddit_g" "reddit" "confusion_o" "confusion_g" "confusion" "students")
+TYPES=("decimalgamma" "decimalgamma-loose" "default")
+QUERIES=("hreddit_o" "hreddit_g" "hreddit" "reddit_o" "reddit_g" "reddit")
 REPETITIONS=11
 
 for QUERY in "${QUERIES[@]}"; do
@@ -15,9 +15,9 @@ for QUERY in "${QUERIES[@]}"; do
       continue
     fi
 
-#    if [[ "${QUERY}" == *_o ]] && [ "${TYPE}" == "decimalgamma-loose" ]; then
-#      continue
-#    fi
+    if [[ "${QUERY}" == *_o ]] && [ "${TYPE}" == "decimalgamma-loose" ]; then
+      continue
+    fi
 
     echo "${QUERY} ${TYPE}"
     for ((i = 0; i < "${REPETITIONS}"; i++)); do
