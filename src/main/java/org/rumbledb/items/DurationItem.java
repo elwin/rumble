@@ -220,7 +220,7 @@ public class DurationItem implements Item {
     public byte[] serializeBinary() {
         return DecimalGamma.Encode(
             this.getValue()
-                .toDurationFrom(new DateTime(1970, 1, 1, 0, 0))
+                .toStandardDuration()
                 .getMillis()
         )
             .toBytes();
