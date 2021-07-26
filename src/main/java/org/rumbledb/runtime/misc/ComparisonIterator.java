@@ -210,6 +210,9 @@ public class ComparisonIterator extends AtMostOneItemLocalRuntimeIterator {
         if (!left.isAtomic() || !right.isAtomic())
             return false;
 
+        if (left.isNull() || right.isNull())
+            return true;
+
         return left.getOrderID() == right.getOrderID();
     }
 
@@ -219,6 +222,14 @@ public class ComparisonIterator extends AtMostOneItemLocalRuntimeIterator {
             ComparisonOperator comparisonOperator,
             ExceptionMetadata metadata
     ) {
+        if (RumbleRuntimeConfiguration.getUseDecimalGamma()) {
+            if (comparable(left, right)) {
+                return processBinary(left.getBinaryKey(), right.getBinaryKey());
+            }
+
+            return Long.MIN_VALUE;
+        }
+
         if (left.isNull() && right.isNull()) {
             return 0;
         }
@@ -227,14 +238,6 @@ public class ComparisonIterator extends AtMostOneItemLocalRuntimeIterator {
         }
         if (!left.isNull() && right.isNull()) {
             return 1;
-        }
-
-        if (RumbleRuntimeConfiguration.getUseDecimalGamma()) {
-            if (comparable(left, right)) {
-                return processBinary(left.getBinaryKey(), right.getBinaryKey());
-            }
-
-            return Long.MIN_VALUE;
         }
 
         if (

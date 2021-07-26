@@ -29,7 +29,6 @@ import org.rumbledb.context.DynamicContext;
 import org.rumbledb.context.Name;
 import org.rumbledb.exceptions.OurBadException;
 import org.rumbledb.expressions.flowr.OrderByClauseSortingKey;
-import org.rumbledb.items.NullItem;
 import org.rumbledb.runtime.RuntimeIterator;
 import org.rumbledb.runtime.flwor.expression.OrderByClauseAnnotatedChildIterator;
 import org.rumbledb.types.BuiltinTypesCatalogue;
@@ -56,9 +55,9 @@ public class BinaryOrderClauseCreateColumnsUDF implements UDF1<Row, Row> {
     // nulls and empty sequences have special ordering captured in the first sorting column
     // if non-null, non-empty-sequence value is given, the second column is used to sort the input
     // indices are assigned to each value type for the first column
-    private static int emptySequenceOrderIndexFirst = 1; // by default, empty sequence is taken as first(=least)
-    private static int emptySequenceOrderIndexLast = 4; // by default, empty sequence is taken as first(=least)
-    private static int nullOrderIndex = 2; // null is the smallest value except empty sequence(default)
+    private static int emptySequenceOrderIndexFirst = 0; // by default, empty sequence is taken as first(=least)
+    private static int emptySequenceOrderIndexLast = 20; // by default, empty sequence is taken as first(=least)
+    private static int nullOrderIndex = 1; // null is the smallest value except empty sequence(default)
     private static int valueOrderIndex = 3; // values are larger than null and empty sequence(default)
 
     private static final List<Name> types = Stream.of(
@@ -128,9 +127,9 @@ public class BinaryOrderClauseCreateColumnsUDF implements UDF1<Row, Row> {
 
 
     private void createColumnsForItem(Item nextItem, int expressionIndex) {
-        if (nextItem instanceof NullItem) {
-            this.results.add(nullOrderIndex);
-            this.results.add(null); // placeholder for valueColumn(2nd column)
+        if (nextItem.isNull()) { // slower than instanceof?
+            this.results.add(nextItem.getOrderID());
+            this.results.add(nextItem.getBinaryKey());
         } else {
             // any other atomic type
             this.results.add(nextItem.getOrderID());

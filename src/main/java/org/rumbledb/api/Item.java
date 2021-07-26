@@ -612,23 +612,23 @@ public interface Item extends Serializable, KryoSerializable {
 
     default int getOrderID() {
         if (this.isNull())
-            return 10;
+            return 1;
         if (this.isNumeric())
-            return 11;
+            return 2;
         if (this.isString() || this.isAnyURI())
-            return 12;
+            return 4;
         if (this.isBinary())
-            return 14;
+            return 5;
         if (this.isBoolean())
-            return 15;
+            return 6;
         if (this.isTime())
-            return 16;
+            return 7;
         if (this.isDuration() || this.isDayTimeDuration() || this.isYearMonthDuration())
-            return 17;
+            return 8;
         if (this.isDateTime())
-            return 18;
+            return 9;
         if (this.isDate())
-            return 19;
+            return 10;
 
         throw new UnsupportedOperationException("Operation not defined for type " + this.getDynamicType());
     }

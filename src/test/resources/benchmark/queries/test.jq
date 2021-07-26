@@ -1,5 +1,4 @@
-for $i in json-file("src/test/resources/benchmark/datasets/confusion.json")
-let $key := date($i.date)
+for $i in json-file("src/test/resources/benchmark/datasets/reddit.json")
+let $key := $i.score
 group by $key
-order by $key
-return $key
+return {"score": $key, "count": count($i)}

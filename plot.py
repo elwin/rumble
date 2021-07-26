@@ -14,46 +14,46 @@ colors = [
 ]
 
 benchmarks = [
-    {
-        "title": "Students: group & order by",
-        "filename": "students"
-    },
-    {
-        "title": "Confusion: group & order by",
-        "filename": "confusion"
-    },
-    {
-        "title": "Confusion: group by",
-        "filename": "confusion_g"
-    },
-    {
-        "title": "Confusion: order by",
-        "filename": "confusion_o"
-    },
-    {
-        "title": "Git: group & order by",
-        "filename": "git"
-    },
-    {
-        "title": "Git: group by",
-        "filename": "git_g"
-    },
-    {
-        "title": "Git: order by",
-        "filename": "git_o"
-    },
-    {
-        "title": "Reddit: group & order by",
-        "filename": "reddit"
-    },
-    {
-        "title": "Reddit: group by",
-        "filename": "reddit_g"
-    },
-    {
-        "title": "Reddit: order by",
-        "filename": "reddit_o"
-    },
+    # {
+    #     "title": "Students: group & order by",
+    #     "filename": "students"
+    # },
+    # {
+    #     "title": "Confusion: group & order by",
+    #     "filename": "confusion"
+    # },
+    # {
+    #     "title": "Confusion: group by",
+    #     "filename": "confusion_g"
+    # },
+    # {
+    #     "title": "Confusion: order by",
+    #     "filename": "confusion_o"
+    # },
+    # {
+    #     "title": "Git: group & order by",
+    #     "filename": "git"
+    # },
+    # {
+    #     "title": "Git: group by",
+    #     "filename": "git_g"
+    # },
+    # {
+    #     "title": "Git: order by",
+    #     "filename": "git_o"
+    # },
+    # {
+    #     "title": "Reddit: group & order by",
+    #     "filename": "reddit"
+    # },
+    # {
+    #     "title": "Reddit: group by",
+    #     "filename": "reddit_g"
+    # },
+    # {
+    #     "title": "Reddit: order by",
+    #     "filename": "reddit_o"
+    # },
     {
         "title": "Reddit: group & order by",
         "filename": "reddit_2"
@@ -66,23 +66,23 @@ benchmarks = [
         "title": "Reddit: order by",
         "filename": "reddit_2_o"
     },
-    {
-        "title": "Reddit: group & order by",
-        "filename": "reddit_3"
-    },
-    {
-        "title": "Reddit: group by",
-        "filename": "reddit_3_g"
-    },
-    {
-        "title": "Reddit: order by",
-        "filename": "reddit_3_o"
-    },
+    # {
+    #     "title": "Reddit: group & order by",
+    #     "filename": "reddit_3"
+    # },
+    # {
+    #     "title": "Reddit: group by",
+    #     "filename": "reddit_3_g"
+    # },
+    # {
+    #     "title": "Reddit: order by",
+    #     "filename": "reddit_3_o"
+    # },
 ]
 
 
 def main():
-    sns.set_theme(style='darkgrid', palette='Set2', font='Helvetica Neue')
+    sns.set_theme(style='whitegrid', palette='Set2', font='Helvetica Neue')
     sns.set_palette(sns.color_palette(colors))
 
     for benchmark in benchmarks:
@@ -92,13 +92,22 @@ def main():
             continue
 
         df['duration (s)'] = df['duration (ms)'] / 1000
-        df = df.groupby('optimization').agg([np.median, np.mean, np.std])
-        print(df)
+
+        print(benchmark['filename'])
+        print(df
+              .groupby('optimization')
+              .agg(np.median)
+              .transpose())
+
+        order = ['default', 'decimalgamma', 'decimalgamma-loose']
+        order = [x for x in order if x in df['optimization'].unique().tolist()]
 
         plt = sns.barplot(
-            data=df['duration (s)'],
-            y='median',
-            x=df.index,
+            data=df,
+            x='optimization',
+            y='duration (s)',
+            order=order,
+            estimator=np.median,
         )
 
         plt.set(xlabel=None, ylabel='median running time (s)')
