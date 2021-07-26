@@ -37,6 +37,8 @@ import java.math.BigInteger;
 
 public class DecimalItem implements Item {
 
+
+    private static final long serialVersionUID = 1L;
     private BigDecimal value;
 
     public DecimalItem() {
