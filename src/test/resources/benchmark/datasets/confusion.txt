@@ -1,5 +1,0 @@
-Unfortunately, the confusion dataset is too large to be tracked by GitHubs LFS (the limit for free accounts is at 2GB
-per file). Please download the following dataset, unarchive it and place the entire folder with the name "confusion"
-in this directory.
-
-https://lars.yencken.org/datasets/languagegame/
