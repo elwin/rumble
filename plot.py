@@ -4,6 +4,7 @@ import seaborn as sns
 import numpy as np
 
 results_dir = 'results'
+output_dir = 'results/generated'
 colors = [
     "#E59996",
     "#B66475",
@@ -94,10 +95,11 @@ def main():
         df['duration (s)'] = df['duration (ms)'] / 1000
 
         print(benchmark['filename'])
-        print(df
-              .groupby('optimization')
-              .agg(np.median)
-              .transpose())
+        median = (df
+                  .groupby('optimization')
+                  .agg(np.median)
+                  )
+        print(median)
 
         order = ['default', 'decimalgamma', 'decimalgamma-loose']
         order = [x for x in order if x in df['optimization'].unique().tolist()]
@@ -110,10 +112,12 @@ def main():
             estimator=np.median,
         )
 
+        median.to_csv(f"{output_dir}/{benchmark['filename']}_median.csv")
+
         plt.set(xlabel=None, ylabel='median running time (s)')
         plt.set_title(benchmark['title'])
-        plt.figure.savefig(f"{results_dir}/{benchmark['filename']}.pdf", bbox_inches="tight")
-        plt.figure.savefig(f"{results_dir}/{benchmark['filename']}.png", bbox_inches="tight", dpi=300)
+        plt.figure.savefig(f"{output_dir}/{benchmark['filename']}.pdf", bbox_inches="tight")
+        plt.figure.savefig(f"{output_dir}/{benchmark['filename']}.png", bbox_inches="tight", dpi=300)
         matplotlib.pyplot.close()
 
 
