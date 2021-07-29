@@ -29,6 +29,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         mkdir -p ~/.m2
+        echo "<settings><servers><server><id>github</id><username>elwin</username><password>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</password></server></servers></settings>" > ~/.m2/settings.xml
         mvn install -DskipTests -Dgpg.skip --quiet
     - name: Compile with Maven
       run: mvn clean compile assembly:single
